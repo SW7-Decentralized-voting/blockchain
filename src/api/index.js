@@ -1,25 +1,26 @@
-const express = require('express');
-const { ethers } = require('ethers');
+import express from 'express';
+import { ethers, JsonRpcProvider } from 'ethers';
 const app = express();
 app.use(express.json());
-const generateAccount = require('../utils/generateAccount');
-const startBlockchain = require('../utils/startBlockchain');
+import generateAccount from '../utils/generateAccount.js';
+import startBlockchain from '../utils/startBlockchain.js';
+//import ABIArtifact from '../../artifacts/contracts/Election.sol/Election.json';
+import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' assert { type: "json" };
 
 
 // Configuration
 const main = async () => {
   // ABI is defined for communication with compiled contract
-  const ABI = require('../../artifacts/contracts/Election.sol/Election.json').abi; // Update path to your ABI
-  const ABIBytecode = require('../../artifacts/contracts/Election.sol/Election.json').bytecode;
-  const wallet = generateAccount;
+  const { abi: ABI, bytecode: ABIBytecode } = electionConfig;
+  // Blockchain host (?)
+  const provider = new JsonRpcProvider('http://127.0.0.1:8545'); 
+  const wallet = generateAccount().connect(provider);
   // Starts the blockchain
   const election = await startBlockchain(ABI, ABIBytecode, wallet);
   // Get address from election
   const CONTRACT_ADDRESS = election.address;
   // Get election contract from contract address, ABI and wallet
-  const electionContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
-  // Blockchain host (?)
-  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL || 'http://127.0.0.1:8545');  
+  const electionContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet); 
 
   // Add a candidate to the election
   app.post('/add-candidate', async (req, res) => {

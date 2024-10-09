@@ -1,5 +1,4 @@
-// utils/startBlockchain.js
-const { ethers } = require('ethers');
+import { ethers } from 'ethers';
 
 async function startBlockchain(ABI, bytecode, wallet) {
   const ElectionFactory = new ethers.ContractFactory(
@@ -14,5 +13,4 @@ async function startBlockchain(ABI, bytecode, wallet) {
   return election;
 }
 
-// Export the function
-module.exports = startBlockchain;
+export default startBlockchain;

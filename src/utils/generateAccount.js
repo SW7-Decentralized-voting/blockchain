@@ -1,5 +1,5 @@
-const { ethers } = require('ethers');
+import { ethers } from 'ethers';
 
-const wallet = ethers.Wallet.createRandom();
+const generateAccount = () => ethers.Wallet.createRandom();
 
-module.exports = { wallet };
+export default generateAccount;

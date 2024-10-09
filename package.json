@@ -2,10 +2,11 @@
     "name": "blockchain",
     "version": "1.0.0",
     "description": "",
+    "type": "module",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "concurrently \"npx hardhat node\" \"node src/api/index.js\""
+        "dev": "concurrently -k \"npx hardhat node\" \"sleep 5 && node src/api/index.js\""
     },
     "keywords": [],
     "author": "",
@@ -16,6 +17,7 @@
     },
     "dependencies": {
         "concurrently": "^9.0.1",
+        "ethers": "^6.13.3",
         "express": "^4.21.1"
     }
 }
