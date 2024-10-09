@@ -1,14 +1,14 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("BlockchainElection Contract", function () {
+describe("Election Contract", function () {
     let ElectionContract;
     let election;
     let owner, addr1;
 
     beforeEach(async function () {
         // Get the contract and deploy it
-        ElectionContract = await ethers.getContractFactory("BlockchainElection");
+        ElectionContract = await ethers.getContractFactory("Election");
         [owner, addr1] = await ethers.getSigners();
         election = await ElectionContract.deploy();
     });

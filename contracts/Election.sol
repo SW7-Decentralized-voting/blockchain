@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
-contract BlockchainElection {
+contract Election {
     // Election Phases
     enum ElectionPhase { Registration, Voting, Tallying }
     ElectionPhase public phase;
