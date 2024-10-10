@@ -1,6 +1,5 @@
 import express from 'express';
 import pkg from 'hardhat';
-import { JsonRpcProvider } from 'ethers';
 const { ethers } = pkg;
 const app = express();
 app.use(express.json());
