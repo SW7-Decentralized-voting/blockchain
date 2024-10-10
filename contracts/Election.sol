@@ -63,6 +63,14 @@ contract Election {
         totalCandidates++;
     }
 
+    function getCandidates() public view returns (Candidate[] memory) {
+        Candidate[] memory candidateList = new Candidate[](totalCandidates);
+        for (uint i = 0; i < totalCandidates; i++) {
+            candidateList[i] = candidates[i];
+        }
+        return candidateList;
+    }
+
     // Function to add parties to the election
     function addParty(string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
         parties[totalParties] = Party(totalParties, _name, 0);

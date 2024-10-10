@@ -1,4 +1,5 @@
-import { ethers } from 'ethers';
+import pkg from 'hardhat';
+const { ethers } = pkg;
 
 async function startBlockchain(ABI, bytecode, wallet) {
   const ElectionFactory = new ethers.ContractFactory(
@@ -8,7 +9,6 @@ async function startBlockchain(ABI, bytecode, wallet) {
   );
   
   const election = await ElectionFactory.deploy(); // Note: Changed from Election to ElectionFactory
-  await election.deployed();
   
   return election;
 }
