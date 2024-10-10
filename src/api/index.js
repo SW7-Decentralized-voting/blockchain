@@ -72,7 +72,6 @@ const generateAccounts = async () => {
     console.log(`Deployer: ${deployer.address}`);
     console.log(`Citizen 1: ${citizen1.address}`);
     console.log(`Citizen 2: ${citizen2.address}`);
-
     console.log('Citizen 1 balance:', (await ethers.provider.getBalance(citizen1.address)).toString());
 
     return { deployer, citizen1, citizen2, otherCitizens };
