@@ -7,7 +7,6 @@ import startBlockchain from '../utils/startBlockchain.js';
 //import ABIArtifact from '../../artifacts/contracts/Election.sol/Election.json';
 import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' assert { type: "json" };
 
-
 // Configuration
 const main = async () => {
     // ABI is defined for communication with compiled contract
