@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 import startBlockchain from '../utils/startBlockchain.js';
 //import ABIArtifact from '../../artifacts/contracts/Election.sol/Election.json';
-import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' assert { type: "json" };
+import electionConfig from '../../artifacts/contracts/Election.sol/Election.json';
 
 // Configuration
 const main = async () => {
@@ -16,8 +16,6 @@ const main = async () => {
 
     // Starts the blockchain
     const election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
-
-    console.log('Initial election phase:', await election.phase());
     // Add a candidate to the election
     app.post('/add-candidate', async (req, res) => {
         const { name, party } = req.body;
@@ -29,7 +27,6 @@ const main = async () => {
         try {
             // Ensure the contract is in registration phase
             const currentPhase = await election.phase();
-            console.log('Current phase:', currentPhase.toString());
             if (currentPhase.toString() !== '0') {
                 return res.status(400).json({ error: 'Election is not in the registration phase' });
             }
@@ -43,6 +40,7 @@ const main = async () => {
                 transactionHash: tx.hash
             });
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(error);
             res.status(500).json({ error: 'Error adding candidate' });
         }
@@ -54,6 +52,7 @@ const main = async () => {
             const candidates = await election.getCandidates();
             res.json(candidates);
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(error);
             res.status(500).json({ error: 'Error getting candidates' });
         }
@@ -62,6 +61,7 @@ const main = async () => {
     // Start the server
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
+        // eslint-disable-next-line no-console
         console.log(`Server is running on port ${PORT}`);
     });
 };
@@ -69,13 +69,8 @@ const main = async () => {
 const generateAccounts = async () => {
     const [deployer, citizen1, citizen2, ...otherCitizens] = await ethers.getSigners();
 
-    console.log(`Deployer: ${deployer.address}`);
-    console.log(`Citizen 1: ${citizen1.address}`);
-    console.log(`Citizen 2: ${citizen2.address}`);
-    console.log('Citizen 1 balance:', (await ethers.provider.getBalance(citizen1.address)).toString());
-
     return { deployer, citizen1, citizen2, otherCitizens };
-}
+};
 
 // Call the main function to start the application
 main();
