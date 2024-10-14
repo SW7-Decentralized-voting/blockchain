@@ -31,7 +31,7 @@ const main = async () => {
         const tx = await election.addVotingKey(keys[i].address);
         await tx.wait();
       }
-      res.status(200).json({ message: 'Election started' });
+      res.status(200).json({ message: 'Election started with ' + numKeys + ' keys' });
     } catch (error) {
       res.status(500).json({ error: 'Error starting election' });
     }
