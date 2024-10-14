@@ -34,10 +34,12 @@ contract Election {
     uint public totalParties;
     
     address public electionOwner;
+    string public decryptionKey;
 
     // Events for vote submission and phase changes
     event VoteCast(bytes32 key, uint entityId, bool isParty, uint encryptedVote);
     event PhaseChanged(ElectionPhase newPhase);
+    event DecryptionKeyPublished(string decryptionKey);
 
     // Constructor sets the contract owner (who can control election phases)
     constructor() {
@@ -119,20 +121,9 @@ contract Election {
         emit PhaseChanged(ElectionPhase.Tallying);
     }
 
-    // Function to tally votes after decryption (simulated)
-    function tallyVotes(uint[] memory decryptedCandidateVotes, uint[] memory decryptedPartyVotes) public onlyOwner inPhase(ElectionPhase.Tallying) {
-        require(decryptedCandidateVotes.length == totalCandidates, "Invalid candidate vote count.");
-        require(decryptedPartyVotes.length == totalParties, "Invalid party vote count.");
-
-        // Simulate tallying decrypted candidate votes
-        for (uint i = 0; i < totalCandidates; i++) {
-            candidates[i].encryptedVotes = decryptedCandidateVotes[i];
-        }
-
-        // Simulate tallying decrypted party votes
-        for (uint i = 0; i < totalParties; i++) {
-            parties[i].encryptedVotes = decryptedPartyVotes[i];
-        }
+    function publishDecryptionKey(string memory key) public onlyOwner inPhase(ElectionPhase.Tallying) {
+        decryptionKey = key;
+        emit DecryptionKeyPublished(key);
     }
 
     // Function to get candidate details (for tallying purposes)

@@ -73,6 +73,35 @@ const main = async () => {
     }
   });
 
+  // Cast an encrypted vote
+  app.post('/vote', async (req, res) => {
+    const { votingKey, entityId, isParty, encryptedVote } = req.body;
+
+    if (!votingKey || !entityId || encryptedVote === undefined) {
+      return res.status(400).json({ error: 'Voting key, entity ID, and encrypted vote are required' });
+    }
+
+    try {
+      // Ensure the contract is in voting phase
+      const currentPhase = await election.phase();
+      if (currentPhase.toString() !== '1') {
+        return res.status(400).json({ error: 'Election is not in the voting phase' });
+      }
+
+      // Cast the encrypted vote
+      const tx = await election.voteWithKey(votingKey, entityId, isParty, encryptedVote);
+      await tx.wait(); // Wait for the transaction to be mined
+
+      res.json({
+        message: 'Vote cast successfully',
+        transactionHash: tx.hash
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error casting vote' });
+    }
+  });
+
   // Start the server
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
