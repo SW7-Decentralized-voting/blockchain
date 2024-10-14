@@ -4,7 +4,6 @@ const { ethers } = pkg;
 const app = express();
 app.use(express.json());
 import startBlockchain from '../utils/startBlockchain.js';
-//import ABIArtifact from '../../artifacts/contracts/Election.sol/Election.json';
 import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' assert { type: 'json' };
 
 // Configuration
@@ -15,6 +14,7 @@ const main = async () => {
   const accounts = await generateAccounts();
 
   let election = null;
+  let keys = [];
 
   // Start election
   app.post('/election/start', async (req, res) => {
@@ -25,6 +25,12 @@ const main = async () => {
 
     try {
       election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
+      const numKeys = req.body.numKeys;
+      keys = await generateKeys(numKeys);
+      for (let i = 0; i < numKeys; i++) {
+        const tx = await election.addVotingKey(keys[i].address);
+        await tx.wait();
+      }
       res.status(200).json({ message: 'Election started' });
     } catch (error) {
       res.status(500).json({ error: 'Error starting election' });
