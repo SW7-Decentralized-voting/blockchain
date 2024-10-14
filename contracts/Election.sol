@@ -6,12 +6,6 @@ contract Election {
     enum ElectionPhase { Registration, Voting, Tallying }
     ElectionPhase public phase;
 
-    // Structures for voting keys, candidates, and parties
-    struct VotingKey {
-        bool isValid;
-        bool isUsed;
-    }
-
     struct Candidate {
         uint id;
         string name;
@@ -25,13 +19,17 @@ contract Election {
         uint encryptedVotes; // Placeholder for homomorphic aggregation
     }
 
-    mapping(bytes32 => VotingKey) public votingKeys; // To store generated keys
+    struct VotingKey {
+        bool isValid;
+        bool isUsed;
+    }
+
     mapping(uint => Candidate) public candidates;    // To store candidates
     mapping(uint => Party) public parties;           // To store parties
-    uint public totalGeneratedKeys;
-    uint public totalUsedKeys;
+    mapping(bytes32 => VotingKey) public votingKeys; // To store valid voting keys
     uint public totalCandidates;
     uint public totalParties;
+    uint public totalUsedKeys;
     
     address public electionOwner;
     string public decryptionKey;
@@ -79,22 +77,16 @@ contract Election {
         totalParties++;
     }
 
-    // Function to generate voting keys
-    function generateVotingKeys(uint numKeys) public onlyOwner inPhase(ElectionPhase.Registration) {
-        for (uint i = 0; i < numKeys; i++) {
-            bytes32 newKey = keccak256(abi.encodePacked(block.timestamp, i));
-            votingKeys[newKey] = VotingKey(true, false);
-            totalGeneratedKeys++;
-        }
-    }
-
     // Function to start the voting phase
     function startVotingPhase() public onlyOwner inPhase(ElectionPhase.Registration) {
         phase = ElectionPhase.Voting;
         emit PhaseChanged(ElectionPhase.Voting);
     }
 
-    // Function to allow voters to cast votes using their voting key for a candidate or a party
+    function addVotingKey(bytes32 keyHash) public onlyOwner inPhase(ElectionPhase.Registration) {
+        votingKeys[keyHash] = VotingKey(true, false);
+    }
+
     function voteWithKey(bytes32 key, uint entityId, bool isParty, uint encryptedVote) public inPhase(ElectionPhase.Voting) {
         require(votingKeys[key].isValid, "Invalid voting key.");
         require(!votingKeys[key].isUsed, "This key has already been used.");
