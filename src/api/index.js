@@ -4,17 +4,19 @@ const { ethers } = pkg;
 const app = express();
 app.use(express.json());
 import startBlockchain from '../utils/startBlockchain.js';
-import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' assert { type: 'json' };
+import generateKeys from '../utils/generateKeys.js';
+import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' with { type: 'json' };
 
 // Configuration
 const main = async () => {
   // ABI is defined for communication with compiled contract
   const { abi: ABI, bytecode: ABIBytecode } = electionConfig;
-
   const accounts = await generateAccounts();
 
   let election = null;
   let keys = [];
+
+  const provider = new ethers.JsonRpcProvider();
 
   // Start election
   app.post('/election/start', async (req, res) => {
@@ -24,21 +26,36 @@ const main = async () => {
     }
 
     try {
+      // Start the election
       election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
+    } catch (error) {
+      return res.status(500).json({ error: 'Error starting election' });
+    }
+
+    try {
+      // Generate keys and add them to the election
       const numKeys = req.body.numKeys;
-      keys = await generateKeys(numKeys);
+      if (!numKeys || numKeys < 1) {
+        return res.status(400).json({ error: 'Number of keys is required' });
+      }
+      keys = await generateKeys(numKeys, provider);
       for (let i = 0; i < numKeys; i++) {
         const tx = await election.addVotingKey(keys[i].address);
         await tx.wait();
       }
       res.status(200).json({ message: 'Election started with ' + numKeys + ' keys' });
+      console.log(election.votingKeys);
     } catch (error) {
-      res.status(500).json({ error: 'Error starting election' });
+      res.status(500).json({ error: 'Error generating keys and adding them to the election: ' + error.message });
     }
-  })
+  });
 
   // Add a candidate to the election
-  app.post('/add-candidate', async (req, res) => {
+  app.post('/candidate/add', async (req, res) => {
+    if (election === null) {
+      return res.status(400).json({ error: 'Election has not started' });
+    }
+
     const { name, party } = req.body;
 
     if (!name || !party) {
@@ -48,9 +65,11 @@ const main = async () => {
     try {
       // Ensure the contract is in registration phase
       const currentPhase = await election.phase();
-      if (currentPhase.toString() !== '0') {
+      if (currentPhase !== 0) {
         return res.status(400).json({ error: 'Election is not in the registration phase' });
       }
+
+      console.log("Phase: " + phase);
 
       // Add candidate to the election
       const tx = await election.addCandidate(name, party);
@@ -63,7 +82,7 @@ const main = async () => {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
-      res.status(500).json({ error: 'Error adding candidate' });
+      res.status(500).json({ error: 'Error adding candidate ' + error.message });
     }
   });
 
