@@ -4,7 +4,6 @@ const { ethers } = pkg;
 const app = express();
 app.use(express.json());
 import startBlockchain from '../utils/startBlockchain.js';
-import generateKeys from '../utils/generateKeys.js';
 import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' with { type: 'json' };
 
 // Configuration
@@ -14,7 +13,6 @@ const main = async () => {
   const accounts = await generateAccounts();
 
   let election = null;
-  let keys = [];
 
   const provider = new ethers.JsonRpcProvider();
 
@@ -28,25 +26,9 @@ const main = async () => {
     try {
       // Start the election
       election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
+      return res.status(200).json({ message: 'Election started successfully' });
     } catch (error) {
       return res.status(500).json({ error: 'Error starting election' });
-    }
-
-    try {
-      // Generate keys and add them to the election
-      const numKeys = req.body.numKeys;
-      if (!numKeys || numKeys < 1) {
-        return res.status(400).json({ error: 'Number of keys is required' });
-      }
-      keys = await generateKeys(numKeys, provider);
-      for (let i = 0; i < numKeys; i++) {
-        const tx = await election.addVotingKey(keys[i].address);
-        await tx.wait();
-      }
-      res.status(200).json({ message: 'Election started with ' + numKeys + ' keys' });
-      console.log(election.votingKeys);
-    } catch (error) {
-      res.status(500).json({ error: 'Error generating keys and adding them to the election: ' + error.message });
     }
   });
 
