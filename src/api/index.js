@@ -18,7 +18,6 @@ const main = async () => {
 
   // Start election
   app.post('/election/start', async (req, res) => {
-    console.log(req.body);
     if (election !== null) {
       return res.status(400).json({ error: 'Election has already started' });
     }
