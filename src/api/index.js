@@ -6,6 +6,20 @@ app.use(express.json());
 import startBlockchain from '../utils/startBlockchain.js';
 import electionConfig from '../../artifacts/contracts/Election.sol/Election.json' with { type: 'json' };
 
+function convertBigIntToString(obj) {
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  } else if (Array.isArray(obj)) {
+    return obj.map(convertBigIntToString);
+  } else if (typeof obj === 'object' && obj !== null) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key, convertBigIntToString(value)])
+    );
+  } else {
+    return obj;
+  }
+}
+
 // Configuration
 const main = async () => {
   // ABI is defined for communication with compiled contract
@@ -15,6 +29,12 @@ const main = async () => {
   let election = null;
 
   const provider = new ethers.JsonRpcProvider();
+
+  const ElectionPhase = {
+    Registration: 0n,
+    Voting: 1n,
+    Tallying: 2n
+  };
 
   // Start election
   app.post('/election/start', async (req, res) => {
@@ -46,11 +66,9 @@ const main = async () => {
     try {
       // Ensure the contract is in registration phase
       const currentPhase = await election.phase();
-      if (currentPhase !== 0) {
+      if (currentPhase !== ElectionPhase.Registration) {
         return res.status(400).json({ error: 'Election is not in the registration phase' });
       }
-
-      console.log("Phase: " + phase);
 
       // Add candidate to the election
       const tx = await election.addCandidate(name, party);
@@ -71,11 +89,58 @@ const main = async () => {
   app.get('/candidates', async (req, res) => {
     try {
       const candidates = await election.getCandidates();
-      res.json(candidates);
+      const candidatesWithStrings = convertBigIntToString(candidates);
+      res.json(candidatesWithStrings);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
       res.status(500).json({ error: 'Error getting candidates' });
+    }
+  });
+
+  app.post('/party/add', async (req, res) => {
+    if (election === null) {
+      return res.status(400).json({ error: 'Election has not started' });
+    }
+
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+    try {
+      // Ensure the contract is in registration phase
+      const currentPhase = await election.phase();
+      if (currentPhase !== ElectionPhase.Registration) {
+        return res.status(400).json({ error: 'Election is not in the registration phase' });
+      }
+
+      // Add party to the election
+      const tx = await election.addParty(name);
+      await tx.wait(); // Wait for the transaction to be mined
+
+      res.json({
+        message: 'Party added successfully',
+        transactionHash: tx.hash
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      res.status(500).json({ error: 'Error adding party' });
+    }
+  } );
+
+  // Get all parties
+  app.get('/parties', async (req, res) => {
+    try {
+      const parties = await election.getParties();
+      const partiesWithStrings = convertBigIntToString(parties);
+      res.json(partiesWithStrings);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      res.status(500).json({ error: 'Error getting parties' });
     }
   });
 

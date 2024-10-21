@@ -127,4 +127,12 @@ contract Election {
     function getParty(uint partyId) public view returns (string memory, uint) {
         return (parties[partyId].name, parties[partyId].encryptedVotes);
     }
+
+    function getParties() public view returns (Party[] memory) {
+        Party[] memory partyList = new Party[](totalParties);
+        for (uint i = 0; i < totalParties; i++) {
+            partyList[i] = parties[i];
+        }
+        return partyList;
+    }
 }
