@@ -32,7 +32,8 @@ contract Election {
     uint public totalUsedKeys;
     
     address public electionOwner;
-    string public decryptionKey;
+    string private decryptionKey;
+    bool public isKeyPublished;
 
     // Events for vote submission and phase changes
     event VoteCast(bytes32 key, uint entityId, bool isParty, uint encryptedVote);
@@ -43,6 +44,7 @@ contract Election {
     constructor() {
         electionOwner = msg.sender;
         phase = ElectionPhase.Registration; // Start in the registration phase
+        isKeyPublished = false;
     }
 
     // Modifier to restrict certain actions to the owner (election controller)
@@ -113,9 +115,21 @@ contract Election {
         emit PhaseChanged(ElectionPhase.Tallying);
     }
 
-    function publishDecryptionKey(string memory key) public onlyOwner inPhase(ElectionPhase.Tallying) {
+    function uploadDecryptionKey(string memory key) public onlyOwner inPhase(ElectionPhase.Registration) {
         decryptionKey = key;
-        emit DecryptionKeyPublished(key);
+    }
+
+    function publishDecryptionKey() public onlyOwner inPhase(ElectionPhase.Tallying) {
+        isKeyPublished = true; // Mark the key as published
+        emit DecryptionKeyPublished(decryptionKey);
+    }
+
+    function getDecryptionKey() public view returns (string memory) {
+        if (msg.sender == electionOwner) {
+            return decryptionKey;  // Owner can access the key at any time
+        }
+        require(isKeyPublished, "Decryption key has not been published yet.");
+        return decryptionKey;  // Public can access it only after publishing
     }
 
     // Function to get candidate details (for tallying purposes)
