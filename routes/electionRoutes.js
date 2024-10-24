@@ -2,6 +2,7 @@ import express from 'express';
 import startBlockchain from '../utils/startBlockchain.js';
 import { ABI, ABIBytecode, accounts } from '../utils/constants.js';
 import { getElection, setElection } from '../utils/electionManager.js';
+import { generateKeyPair } from '../utils/encryption.js';
 
 const router = express.Router();
 
@@ -11,8 +12,22 @@ router.post('/start', async (req, res, next) => {
   }
 
   try {
+    // Generate a key pair for homomorphic encryption
+    const { publicKey, privateKey } = await generateKeyPair();
+
+    // Serialize the private key
+    const privateKeyString = JSON.stringify({
+      lambda: privateKey.lambda.toString(),
+      mu: privateKey.mu.toString(),
+      publicKey: {
+        n: privateKey.publicKey.n.toString(),
+        g: privateKey.publicKey.g.toString()
+      }
+    });
+
     const election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
     setElection(election);
+    election.uploadDecryptionKey(privateKeyString);
     res.status(200).json({ message: 'Election started successfully' });
   } catch (error) {
     next(error);

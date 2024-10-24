@@ -25,6 +25,7 @@
         "@ethersproject/hdnode": "^5.7.0",
         "concurrently": "^9.0.1",
         "ethers": "^6.13.3",
-        "express": "^4.21.1"
+        "express": "^4.21.1",
+        "paillier-bigint": "^3.4.3"
     }
 }
