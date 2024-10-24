@@ -3,7 +3,7 @@ import { getElection } from '../utils/electionManager.js';
 
 const router = express.Router();
 
-router.get('/decryption-key', async (req, res, next) => {
+router.get('/get-key', async (req, res, next) => {
     const election = getElection();
     if (election === null) {
         return res.status(400).json({ error: 'Election has not started' });
