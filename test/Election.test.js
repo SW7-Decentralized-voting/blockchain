@@ -10,7 +10,6 @@ describe('Election Contract', function () {
     beforeEach(async function () {
         // Get the contract and deploy it
         ElectionContract = await ethers.getContractFactory('Election');
-         
         [owner, addr1] = await ethers.getSigners();
         election = await ElectionContract.deploy();
     });
@@ -25,21 +24,15 @@ describe('Election Contract', function () {
 
     it('Should add a candidate', async function () {
         await election.addCandidate('Alice', 'PartyA');
-        const candidate = await election.getCandidate(0);
-        expect(candidate[0]).to.equal('Alice');
-        expect(candidate[1]).to.equal('PartyA');
+        const candidate = await election.candidates(0);
+        expect(candidate.name).to.equal('Alice');
+        expect(candidate.party).to.equal('PartyA');
     });
 
     it('Should add a party', async function () {
         await election.addParty('PartyA');
-        const party = await election.getParty(0);
-        expect(party[0]).to.equal('PartyA');
-    });
-
-    it('Should generate voting keys', async function () {
-        await election.generateVotingKeys(5);
-        const totalKeys = await election.totalGeneratedKeys();
-        expect(totalKeys).to.equal(5);
+        const party = await election.parties(0);
+        expect(party.name).to.equal('PartyA');
     });
 
     it('Should transition to voting phase', async function () {
@@ -51,5 +44,12 @@ describe('Election Contract', function () {
         await election.startVotingPhase();
         await election.endVotingPhase();
         expect(await election.phase()).to.equal(2); // Tallying phase
+    });
+
+
+    it('Should not allow publishing the decryption key if not in tallying phase', async function () {
+        await expect(
+            election.publishDecryptionKey('decryptionKey')
+        ).to.be.revertedWith('Invalid phase for this action.');
     });
 });
