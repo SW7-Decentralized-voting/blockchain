@@ -25,10 +25,15 @@ router.post('/start', async (req, res, next) => {
       }
     });
 
+    // Start the blockchain and set the election instance
     const election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
     setElection(election);
-    election.uploadDecryptionKey(privateKeyString);
-    res.status(200).json({ message: 'Election started successfully' });
+
+    // Upload the serialized private key to the smart contract
+    await election.uploadDecryptionKey(privateKeyString);
+
+    // Respond with a success message and the public key
+    res.status(200).json({ message: 'Election started successfully', publicKey });
   } catch (error) {
     next(error);
   }
