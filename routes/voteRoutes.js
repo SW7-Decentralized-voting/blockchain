@@ -12,7 +12,7 @@ router.post('/', async (req, res, next) => {
 
   try {
     const currentPhase = await election.phase();
-    if (currentPhase.toString() !== '1') {
+    if (currentPhase !== ElectionPhase.Voting) {
       return res.status(400).json({ error: 'Election is not in the voting phase' });
     }
 

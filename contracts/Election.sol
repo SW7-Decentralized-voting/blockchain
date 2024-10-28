@@ -110,7 +110,7 @@ contract Election {
     }
 
     // Function to end the voting phase and begin tallying
-    function endVotingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
+    function startTallyingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
         phase = ElectionPhase.Tallying;
         emit PhaseChanged(ElectionPhase.Tallying);
     }
