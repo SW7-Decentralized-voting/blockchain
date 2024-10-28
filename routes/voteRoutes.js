@@ -1,5 +1,5 @@
 import express from 'express';
-import { election, ElectionPhase } from '../utils/constants.js';
+import { ElectionPhase } from '../utils/constants.js';
 import { getElection } from '../utils/electionManager.js';
 
 const router = express.Router();
