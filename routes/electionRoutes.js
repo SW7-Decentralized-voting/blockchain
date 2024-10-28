@@ -25,6 +25,12 @@ router.post('/start', async (req, res, next) => {
       }
     });
 
+    // Serialize public key
+    const publicKeyString = JSON.stringify({
+      n: publicKey.n.toString(),
+      g: publicKey.g.toString
+    });
+
     // Start the blockchain and set the election instance
     const election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
     setElection(election);
@@ -33,7 +39,7 @@ router.post('/start', async (req, res, next) => {
     await election.uploadDecryptionKey(privateKeyString);
 
     // Respond with a success message and the public key
-    res.status(200).json({ message: 'Election started successfully', publicKey });
+    res.status(200).json({ message: 'Election started successfully', publicKeyString });
   } catch (error) {
     next(error);
   }
