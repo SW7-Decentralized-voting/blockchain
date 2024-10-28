@@ -35,6 +35,8 @@ router.post('/start', async (req, res, next) => {
     const election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
     setElection(election);
 
+    await election.uploadEncryptionKey(publicKeyString);
+
     // Upload the serialized private key to the smart contract
     await election.uploadDecryptionKey(privateKeyString);
 

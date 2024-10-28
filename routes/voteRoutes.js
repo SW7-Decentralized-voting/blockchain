@@ -1,9 +1,11 @@
 import express from 'express';
 import { election, ElectionPhase } from '../utils/constants.js';
+import { getElection } from '../utils/electionManager.js';
 
 const router = express.Router();
 
 router.post('/', async (req, res, next) => {
+  const election = getElection();
   const { votingKey, entityId, isParty, encryptedVote } = req.body;
 
   if (!votingKey || !entityId || encryptedVote === undefined) {
@@ -23,6 +25,16 @@ router.post('/', async (req, res, next) => {
       message: 'Vote cast successfully',
       transactionHash: tx.hash
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/get-key', async (req, res, next) => {
+  const election = getElection();
+  try {
+    const encryptionKey = await election.getEncryptionKey();
+    res.json(encryptionKey);
   } catch (error) {
     next(error);
   }
