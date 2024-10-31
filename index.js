@@ -3,6 +3,7 @@ import electionRoutes from './routes/electionRoutes.js';
 import candidateRoutes from './routes/candidateRoutes.js';
 import partyRoutes from './routes/partyRoutes.js';
 import voteRoutes from './routes/voteRoutes.js';
+import tallyRoutes from './routes/tallyRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import { PORT } from './config/config.js';
 
@@ -14,6 +15,7 @@ app.use('/election', electionRoutes);
 app.use('/candidate', candidateRoutes);
 app.use('/party', partyRoutes);
 app.use('/vote', voteRoutes);
+app.use('/tally', tallyRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
