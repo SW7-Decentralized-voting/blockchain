@@ -5,12 +5,12 @@ const { ethers } = pkg;
 describe('Election Contract', function () {
     let ElectionContract;
     let election;
-    let owner, addr1;
+    let owner, _addr1;
 
     beforeEach(async function () {
         // Get the contract and deploy it
         ElectionContract = await ethers.getContractFactory('Election');
-        [owner, addr1] = await ethers.getSigners();
+        [owner, _addr1] = await ethers.getSigners();
         election = await ElectionContract.deploy();
     });
 

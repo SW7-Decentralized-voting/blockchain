@@ -8,7 +8,7 @@ export default [
     rules: {
       "semi": ["error", "always"],
       "quotes": ["error", "single"],
-      "no-unused-vars": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "no-undef": "error",
       "no-console": "warn",
       "no-extra-semi": "error",
