@@ -49,7 +49,7 @@ describe('Election Contract', function () {
 
     it('Should not allow publishing the decryption key if not in tallying phase', async function () {
         await expect(
-            election.publishDecryptionKey('decryptionKey')
+            election.publishDecryptionKey()
         ).to.be.revertedWith('Invalid phase for this action.');
-    });
+    });    
 });
