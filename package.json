@@ -6,7 +6,7 @@
     "main": "index.js",
     "scripts": {
         "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
-        "dev": "concurrently -k \"npx hardhat node\" \"wait-on http://localhost:8545/ && nodemon index.js\"",
+        "dev": "concurrently -k \"npx hardhat compile && npx hardhat node\" \"wait-on http://localhost:8545/ && nodemon index.js\"",
         "lint": "eslint ."
     },
     "keywords": [],
