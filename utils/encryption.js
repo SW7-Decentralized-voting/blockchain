@@ -1,10 +1,9 @@
-import * as paillierBigint from 'paillier-bigint';
-
 async function generateKeyPair() {
-    return await paillierBigint.generateRandomKeys(3072);
+    return null;
 }
 
 function encryptVote(vote, publicKey) {
+    // TODO update to new encryption library
     return publicKey.encrypt(vote);
 }
 
