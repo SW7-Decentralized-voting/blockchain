@@ -5,12 +5,12 @@ const { ethers } = pkg;
 describe('Election Contract', function () {
     let ElectionContract;
     let election;
-    let owner, addr1;
+    let owner, _addr1;
 
     beforeEach(async function () {
         // Get the contract and deploy it
         ElectionContract = await ethers.getContractFactory('Election');
-        [owner, addr1] = await ethers.getSigners();
+        [owner, _addr1] = await ethers.getSigners();
         election = await ElectionContract.deploy();
     });
 
@@ -42,14 +42,14 @@ describe('Election Contract', function () {
 
     it('Should transition to tallying phase', async function () {
         await election.startVotingPhase();
-        await election.endVotingPhase();
+        await election.startTallyingPhase();
         expect(await election.phase()).to.equal(2); // Tallying phase
     });
 
 
     it('Should not allow publishing the decryption key if not in tallying phase', async function () {
         await expect(
-            election.publishDecryptionKey('decryptionKey')
+            election.publishDecryptionKey()
         ).to.be.revertedWith('Invalid phase for this action.');
-    });
+    });    
 });

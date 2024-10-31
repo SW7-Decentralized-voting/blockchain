@@ -5,7 +5,7 @@ import convertBigIntToString from '../utils/convertBigIntToString.js';
 
 const router = express.Router();
 
-router.post('/add', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     const election = getElection();
     if (election === null) {
         return res.status(400).json({ error: 'Election has not started' });

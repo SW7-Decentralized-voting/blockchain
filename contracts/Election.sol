@@ -32,6 +32,7 @@ contract Election {
     uint public totalUsedKeys;
     
     address public electionOwner;
+    string public encryptionKey;
     string private decryptionKey;
     bool public isKeyPublished;
 
@@ -110,9 +111,13 @@ contract Election {
     }
 
     // Function to end the voting phase and begin tallying
-    function endVotingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
+    function startTallyingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
         phase = ElectionPhase.Tallying;
         emit PhaseChanged(ElectionPhase.Tallying);
+    }
+
+    function uploadEncryptionKey(string memory key) public onlyOwner inPhase(ElectionPhase.Registration) {
+        encryptionKey = key;
     }
 
     function uploadDecryptionKey(string memory key) public onlyOwner inPhase(ElectionPhase.Registration) {
@@ -122,6 +127,10 @@ contract Election {
     function publishDecryptionKey() public onlyOwner inPhase(ElectionPhase.Tallying) {
         isKeyPublished = true; // Mark the key as published
         emit DecryptionKeyPublished(decryptionKey);
+    }
+
+    function getEncryptionKey() public view returns (string memory) {
+        return encryptionKey;
     }
 
     function getDecryptionKey() public view returns (string memory) {
