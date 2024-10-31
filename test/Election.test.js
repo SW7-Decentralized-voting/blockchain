@@ -42,7 +42,7 @@ describe('Election Contract', function () {
 
     it('Should transition to tallying phase', async function () {
         await election.startVotingPhase();
-        await election.endVotingPhase();
+        await election.startTallyingPhase();
         expect(await election.phase()).to.equal(2); // Tallying phase
     });
 
