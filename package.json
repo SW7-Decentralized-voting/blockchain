@@ -5,7 +5,7 @@
     "type": "module",
     "main": "index.js",
     "scripts": {
-        "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+        "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
         "dev": "concurrently -k \"npx hardhat node\" \"wait-on http://localhost:8545/ && nodemon index.js\"",
         "lint": "eslint ."
     },
@@ -19,7 +19,8 @@
         "hardhat": "^2.22.14",
         "jest": "^29.7.0",
         "nodemon": "^3.1.7",
-        "wait-on": "^8.0.1"
+        "wait-on": "^8.0.1",
+        "cross-env": "^7.0.3"
     },
     "dependencies": {
         "@ethersproject/hdnode": "^5.7.0",
