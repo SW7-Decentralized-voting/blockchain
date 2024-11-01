@@ -2,6 +2,21 @@ import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
 import convertBigIntToString from '../utils/convertBigIntToString.js';
 
+async function getParties(req, res, next) {
+    const election = getElection();
+    if (election === null) {
+        return res.status(400).json({ error: 'Election has not started' });
+    }
+
+    try {
+        const parties = await election.getParties();
+        const partiesWithStrings = convertBigIntToString(parties);
+        res.json(partiesWithStrings);
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function publishParty(name) {
     const election = getElection();
     if (election === null) {
@@ -27,19 +42,6 @@ async function publishParty(name) {
     }
 }
 
-async function getParties(req, res, next) {
-    const election = getElection();
-    if (election === null) {
-        return res.status(400).json({ error: 'Election has not started' });
-    }
 
-    try {
-        const parties = await election.getParties();
-        const partiesWithStrings = convertBigIntToString(parties);
-        res.json(partiesWithStrings);
-    } catch (error) {
-        next(error);
-    }
-}
 
-export { publishParty, getParties };
+export { getParties, publishParty };
