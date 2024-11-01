@@ -2,6 +2,8 @@ import express from 'express';
 import startContract from '../utils/startContract.js';
 import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js';
 import { getElection } from '../utils/electionManager.js';
+import { publishParty } from '../controllers/party.js';
+import { publishCandidate } from '../controllers/candidate.js';
 //import { generateKeyPair } from '../utils/encryption.js';
 
 const router = express.Router();
@@ -11,12 +13,26 @@ router.post('/start', async (req, res, next) => {
     return res.status(400).json({ error: 'Election has already started' });
   }
 
+  // Parse req to a list of candidates and parties
+  const { candidates, parties } = req.body;
+  if (!candidates || !parties) {
+    return res.status(400).json({ error: 'Candidates and parties are required' });
+  }
+
   try {
     // Generate a key pair for homomorphic encryption
     //const { publicKey, privateKey } = await generateKeyPair();
 
     // Start the contract and set the election instance
-    startContract(ABI, ABIBytecode, accounts.citizen1);
+    await startContract(ABI, ABIBytecode, accounts.citizen1);
+
+    for (const party of parties) {
+      await publishParty(party.name);
+    }
+
+    for (const candidate of candidates) {
+      await publishCandidate(candidate.name, candidate.party);
+    }
 
     //await election.uploadEncryptionKey(publicKeyString);
 
