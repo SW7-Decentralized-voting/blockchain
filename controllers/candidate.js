@@ -4,6 +4,10 @@ import { ElectionPhase } from '../utils/constants.js';
 
 async function getCandidates(req, res, next) {
     const election = getElection();
+    if (election === null) {
+        return res.status(400).json({ error: 'Election has not started' });
+    }
+    
     try {
         const candidates = await election.getCandidates();
         const candidatesWithStrings = convertBigIntToString(candidates);
