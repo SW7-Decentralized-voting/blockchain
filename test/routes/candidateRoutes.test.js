@@ -25,25 +25,21 @@ afterAll(() => {
     server.close();
 });
 
-describe('GET /candidates with no election in progress', () => {
-    test('It should respond with the error code 400', async () => {
+describe('GET /candidates', () => {
+    test('It should respond with the error code 400 when no election is in progress', async () => {
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election has not started' });
     });
-});
 
-describe('GET /candidates with an election in progress but no candidates', () => {
-    test('It should respond with 200', async () => {
+    test('It should respond with 200 when an election is in progress but no candidates', async () => {
         await startContract();
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual([]);
     });
-});
 
-describe('GET /candidates with an election in progress and one candidate added', () => {
-    test('It should respond with 200', async () => {
+    test('It should respond with 200 when an election is in progress and one candidate added', async () => {
         await startContract();
         await publishCandidate('Candidate 1', 'Party 1');
         const response = await request(server).get(baseRoute);
