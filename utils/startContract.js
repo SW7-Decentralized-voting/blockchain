@@ -19,6 +19,7 @@ async function startContract() {
     setElection(election);
   }
   catch (error) {
+    // eslint-disable-next-line no-console
     console.error('There was an error deploying the contract: ', error.message);
   }
 
