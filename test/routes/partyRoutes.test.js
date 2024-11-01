@@ -6,7 +6,7 @@ import { getElection } from '../../utils/electionManager.js';
 import { ABI, ABIBytecode, accounts } from '../../utils/constants.js';
 
 let router;
-const baseRoute = '/party';
+const baseRoute = '/parties';
 
 const app = express();
 app.use(express.json());

@@ -14,8 +14,8 @@ router.get('/', (req, res) => {
 
 // Routes
 router.use('/election', electionRoutes);
-router.use('/candidate', candidateRoutes);
-router.use('/party', partyRoutes);
+router.use('/candidates', candidateRoutes);
+router.use('/parties', partyRoutes);
 router.use('/vote', voteRoutes);
 router.use('/tally', tallyRoutes);
 
