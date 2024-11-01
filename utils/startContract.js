@@ -1,9 +1,13 @@
 import pkg from 'hardhat';
-import { setElection } from './electionManager.js';
+import { getElection, setElection } from './electionManager.js';
 import { ABI, ABIBytecode, accounts } from './constants.js';
 const { ethers } = pkg;
 
 async function startContract() {
+  if (getElection() !== null) {
+    throw new Error('Election has already started');
+  }
+  
   const ElectionFactory = new ethers.ContractFactory(
     ABI,
     ABIBytecode,
