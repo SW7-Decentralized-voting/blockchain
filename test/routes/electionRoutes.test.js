@@ -2,7 +2,6 @@ import request from 'supertest';
 import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
-import { ABI, ABIBytecode, accounts } from '../../utils/constants.js';
 
 let router;
 const baseRoute = '/election';
@@ -53,7 +52,7 @@ describe('POST /election/start with no election contract deployed with candidate
 
 describe('POST /election/start with an election contract deployed', () => {
     test('It should respond with the error code 400', async () => {
-        await startContract(ABI, ABIBytecode, accounts.citizen1);
+        await startContract();
         const body = {
             'candidates': [
                 { 'name': 'Johan', 'party': 'democrats' }

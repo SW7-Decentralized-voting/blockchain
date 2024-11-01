@@ -2,7 +2,6 @@ import request from 'supertest';
 import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
-import { ABI, ABIBytecode, accounts } from '../../utils/constants.js';
 import { publishCandidate } from '../../controllers/candidate.js';
 
 let router;
@@ -36,7 +35,7 @@ describe('GET /candidates with no election in progress', () => {
 
 describe('GET /candidates with an election in progress but no candidates', () => {
     test('It should respond with 200', async () => {
-        await startContract(ABI, ABIBytecode, accounts.citizen1);
+        await startContract();
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual([]);
@@ -45,7 +44,7 @@ describe('GET /candidates with an election in progress but no candidates', () =>
 
 describe('GET /candidates with an election in progress and one candidate added', () => {
     test('It should respond with 200', async () => {
-        await startContract(ABI, ABIBytecode, accounts.citizen1);
+        await startContract();
         await publishCandidate('Candidate 1', 'Party 1');
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);

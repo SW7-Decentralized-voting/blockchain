@@ -1,12 +1,13 @@
 import pkg from 'hardhat';
 import { setElection } from './electionManager.js';
+import { ABI, ABIBytecode, accounts } from '../../utils/constants.js';
 const { ethers } = pkg;
 
-async function startContract(ABI, bytecode, wallet) {
+async function startContract() {
   const ElectionFactory = new ethers.ContractFactory(
     ABI,
-    bytecode,
-    wallet
+    ABIBytecode,
+    accounts.citizen1
   );
 
   try {
