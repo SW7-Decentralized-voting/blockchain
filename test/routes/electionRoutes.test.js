@@ -24,112 +24,98 @@ afterAll(() => {
     server.close();
 });
 
-describe('POST /election/start with no election contract deployed and no candidates or parties', () => {
-    test('It should respond with 200', async () => {
-        const body = {
-        };
-        const response = await request(server).post(baseRoute + '/start').send(body);
-        expect(response.statusCode).toBe(400);
-        expect(response.body).toEqual({ error: 'Candidates and parties are required' });
+describe('Election Routes', () => {
+    describe('POST /election/start', () => {
+        test('It should respond with 400 when no election contract is deployed and no candidates or parties', async () => {
+            const body = {};
+            const response = await request(server).post(baseRoute + '/start').send(body);
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual({ error: 'Candidates and parties are required' });
+        });
+
+        test('It should respond with 200 when no election contract is deployed with candidates and parties', async () => {
+            const body = {
+                'candidates': [
+                    { 'name': 'Johan', 'party': 'democrats' }
+                ],
+                'parties': [
+                    { 'name': 'democrats' }
+                ]
+            };
+            const response = await request(server).post(baseRoute + '/start').send(body);
+            expect(response.statusCode).toBe(200);
+            expect(response.body).toEqual({ message: 'Election started successfully' });
+        });
+
+        test('It should respond with 400 when an election contract is already deployed', async () => {
+            await startContract();
+            const body = {
+                'candidates': [
+                    { 'name': 'Johan', 'party': 'democrats' }
+                ],
+                'parties': [
+                    { 'name': 'democrats' }
+                ]
+            };
+            const response = await request(server).post(baseRoute + '/start').send(body);
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual({ error: 'Election has already started' });
+        });
+    });
+
+    describe('POST /election/advance-phase', () => {
+        test('It should respond with 400 when no election contract is deployed', async () => {
+            const response = await request(server).post(baseRoute + '/advance-phase');
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual({ error: 'Election has not started' });
+        });
+
+        test('It should respond with 200 when an election contract is deployed and in registration phase', async () => {
+            const body = {
+                'candidates': [
+                    { 'name': 'Johan', 'party': 'democrats' }
+                ],
+                'parties': [
+                    { 'name': 'democrats' }
+                ]
+            };
+            await request(server).post(baseRoute + '/start').send(body);
+            const response = await request(server).post(baseRoute + '/advance-phase');
+            expect(response.statusCode).toBe(200);
+            expect(response.body).toEqual({ message: 'Election phase advanced to voting phase', transactionHash: expect.any(String) });
+        });
+
+        test('It should respond with 200 when an election contract is deployed and in voting phase', async () => {
+            const body = {
+                'candidates': [
+                    { 'name': 'Johan', 'party': 'democrats' }
+                ],
+                'parties': [
+                    { 'name': 'democrats' }
+                ]
+            };
+            await request(server).post(baseRoute + '/start').send(body);
+            await request(server).post(baseRoute + '/advance-phase');
+            const response = await request(server).post(baseRoute + '/advance-phase');
+            expect(response.statusCode).toBe(200);
+            expect(response.body).toEqual({ message: 'Election phase advanced to tallying phase', transactionHash: expect.any(String) });
+        });
+
+        test('It should respond with 400 when an election contract is deployed and in tallying phase', async () => {
+            const body = {
+                'candidates': [
+                    { 'name': 'Johan', 'party': 'democrats' }
+                ],
+                'parties': [
+                    { 'name': 'democrats' }
+                ]
+            };
+            await request(server).post(baseRoute + '/start').send(body);
+            await request(server).post(baseRoute + '/advance-phase');
+            await request(server).post(baseRoute + '/advance-phase');
+            const response = await request(server).post(baseRoute + '/advance-phase');
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual({ error: 'Election has already ended' });
+        });
     });
 });
-
-describe('POST /election/start with no election contract deployed with candidates and parties', () => {
-    test('It should respond with 200', async () => {
-        const body = {
-            'candidates': [
-                { 'name': 'Johan', 'party': 'democrats' }
-            ],
-            'parties': [
-                { 'name': 'democrats' }
-            ]
-        };
-        const response = await request(server).post(baseRoute + '/start').send(body);
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual({ message: 'Election started successfully' });
-    });
-});
-
-describe('POST /election/start with an election contract deployed', () => {
-    test('It should respond with the error code 400', async () => {
-        await startContract();
-        const body = {
-            'candidates': [
-                { 'name': 'Johan', 'party': 'democrats' }
-            ],
-            'parties': [
-                { 'name': 'democrats' }
-            ]
-        };
-        const response = await request(server).post(baseRoute + '/start').send(body);
-        expect(response.statusCode).toBe(400);
-        expect(response.body).toEqual({ error: 'Election has already started' });
-    });
-}
-);
-
-describe('POST /election/advance-phase with no election contract deployed', () => {
-    test('It should respond with the error code 400', async () => {
-        const response = await request(server).post(baseRoute + '/advance-phase');
-        expect(response.statusCode).toBe(400);
-        expect(response.body).toEqual({ error: 'Election has not started' });
-    });
-}
-);
-
-describe('POST /election/advance-phase with an election contract deployed and in registration phase', () => {
-    test('It should respond with 200', async () => {
-        const body = {
-            'candidates': [
-                { 'name': 'Johan', 'party': 'democrats' }
-            ],
-            'parties': [
-                { 'name': 'democrats' }
-            ]
-        };
-        await request(server).post(baseRoute + '/start').send(body);
-        const response = await request(server).post(baseRoute + '/advance-phase');
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual({ message: 'Election phase advanced to voting phase', transactionHash: expect.any(String) });
-    });
-}
-);
-
-describe('POST /election/advance-phase with an election contract deployed and in voting phase', () => {
-    test('It should respond with 200', async () => {
-        const body = {
-            'candidates': [
-                { 'name': 'Johan', 'party': 'democrats' }
-            ],
-            'parties': [
-                { 'name': 'democrats' }
-            ]
-        };
-        await request(server).post(baseRoute + '/start').send(body);
-        await request(server).post(baseRoute + '/advance-phase');
-        const response = await request(server).post(baseRoute + '/advance-phase');
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual({ message: 'Election phase advanced to tallying phase', transactionHash: expect.any(String) });
-    });
-}
-);
-
-describe('POST /election/advance-phase with an election contract deployed and in tallying phase', () => {
-    test('It should respond with the error code 400', async () => {
-        const body = {
-            'candidates': [
-                { 'name': 'Johan', 'party': 'democrats' }
-            ],
-            'parties': [
-                { 'name': 'democrats' }
-            ]
-        };
-        await request(server).post(baseRoute + '/start').send(body);
-        await request(server).post(baseRoute + '/advance-phase');
-        await request(server).post(baseRoute + '/advance-phase');
-        const response = await request(server).post(baseRoute + '/advance-phase');
-        expect(response.statusCode).toBe(400);
-        expect(response.body).toEqual({ error: 'Election has already ended' });
-    });
-}
-);
