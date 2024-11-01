@@ -1,6 +1,6 @@
 import pkg from 'hardhat';
 import { setElection } from './electionManager.js';
-import { ABI, ABIBytecode, accounts } from '../../utils/constants.js';
+import { ABI, ABIBytecode, accounts } from './constants.js';
 const { ethers } = pkg;
 
 async function startContract() {

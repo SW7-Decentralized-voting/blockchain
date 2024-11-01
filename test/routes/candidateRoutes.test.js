@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
-import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
+import stopContract from '../../utils/stopContract.js';
 import { publishCandidate } from '../../controllers/candidate.js';
 
 let router;
