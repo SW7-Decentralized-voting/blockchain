@@ -26,7 +26,7 @@ afterAll(() => {
     server.close();
 });
 
-describe('GET /parties with no election in progress', () => {
+describe('GET /parties with no contract deployed', () => {
     test('It should respond with the error code 400', async () => {
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(400);
@@ -34,7 +34,7 @@ describe('GET /parties with no election in progress', () => {
     });
 });
 
-describe('GET /parties with an election in progress but no parties', () => {
+describe('GET /parties with an election contract deployed but no parties', () => {
     test('It should respond with 200', async () => {
         await startContract(ABI, ABIBytecode, accounts.citizen1);
         const response = await request(server).get(baseRoute);
@@ -43,7 +43,7 @@ describe('GET /parties with an election in progress but no parties', () => {
     });
 });
 
-describe('GET /parties with an election in progress and one party added', () => {
+describe('GET /parties with an election contract deployed and one party added', () => {
     test('It should respond with 200', async () => {
         await startContract(ABI, ABIBytecode, accounts.citizen1);
         await publishParty('Party 1');
