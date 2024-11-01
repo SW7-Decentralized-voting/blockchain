@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { ElectionPhase } from '../../utils/constants.js';
 import pkg from 'hardhat';
 const { ethers } = pkg;
 
@@ -37,13 +38,13 @@ describe('Election Contract', function () {
 
     it('Should transition to voting phase', async function () {
         await election.startVotingPhase();
-        expect(await election.phase()).to.equal(1); // Voting phase
+        expect(await election.phase()).to.equal(ElectionPhase.Voting); // Voting phase
     });
 
     it('Should transition to tallying phase', async function () {
         await election.startVotingPhase();
         await election.startTallyingPhase();
-        expect(await election.phase()).to.equal(2); // Tallying phase
+        expect(await election.phase()).to.equal(ElectionPhase.Tallying); // Tallying phase
     });
 
 
@@ -51,5 +52,5 @@ describe('Election Contract', function () {
         await expect(
             election.publishDecryptionKey()
         ).to.be.revertedWith('Invalid phase for this action.');
-    });    
+    });
 });
