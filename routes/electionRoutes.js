@@ -1,5 +1,5 @@
 import express from 'express';
-import startBlockchain from '../utils/startBlockchain.js';
+import startContract from '../utils/startContract.js';
 import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js';
 import { getElection } from '../utils/electionManager.js';
 //import { generateKeyPair } from '../utils/encryption.js';
@@ -15,8 +15,8 @@ router.post('/start', async (req, res, next) => {
     // Generate a key pair for homomorphic encryption
     //const { publicKey, privateKey } = await generateKeyPair();
 
-    // Start the blockchain and set the election instance
-    startBlockchain(ABI, ABIBytecode, accounts.citizen1);
+    // Start the contract and set the election instance
+    startContract(ABI, ABIBytecode, accounts.citizen1);
 
     //await election.uploadEncryptionKey(publicKeyString);
 
