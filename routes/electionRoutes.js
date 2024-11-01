@@ -1,7 +1,7 @@
 import express from 'express';
 import startBlockchain from '../utils/startBlockchain.js';
 import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js';
-import { getElection, setElection } from '../utils/electionManager.js';
+import { getElection } from '../utils/electionManager.js';
 //import { generateKeyPair } from '../utils/encryption.js';
 
 const router = express.Router();
@@ -16,8 +16,7 @@ router.post('/start', async (req, res, next) => {
     //const { publicKey, privateKey } = await generateKeyPair();
 
     // Start the blockchain and set the election instance
-    const election = await startBlockchain(ABI, ABIBytecode, accounts.citizen1);
-    setElection(election);
+    startBlockchain(ABI, ABIBytecode, accounts.citizen1);
 
     //await election.uploadEncryptionKey(publicKeyString);
 

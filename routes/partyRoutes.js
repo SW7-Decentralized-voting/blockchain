@@ -37,6 +37,10 @@ router.post('/', async (req, res, next) => {
 
 router.get('/', async (req, res, next) => {
     const election = getElection();
+  if (election === null) {
+    return res.status(400).json({ error: 'Election has not started' });
+  }
+  
   try {
     const parties = await election.getParties();
     const partiesWithStrings = convertBigIntToString(parties);

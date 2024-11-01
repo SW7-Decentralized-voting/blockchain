@@ -1,4 +1,5 @@
 import pkg from 'hardhat';
+import { setElection } from './electionManager.js';
 const { ethers } = pkg;
 
 async function startBlockchain(ABI, bytecode, wallet) {
@@ -7,10 +8,15 @@ async function startBlockchain(ABI, bytecode, wallet) {
     bytecode,
     wallet
   );
-  
-  const election = await ElectionFactory.deploy(); // Note: Changed from Election to ElectionFactory
-  
-  return election;
+
+  try {
+    const election = await ElectionFactory.deploy();
+    setElection(election);
+  }
+  catch (error) {
+    console.error('There was an error deploying the contract: ', error);
+  }
+
 }
 
 export default startBlockchain;
