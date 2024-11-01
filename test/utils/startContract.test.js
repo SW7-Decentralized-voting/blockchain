@@ -7,16 +7,14 @@ beforeEach(async () => {
 }
 );
 
-describe('startContract with no contract deployed', () => {
-    test('It should set the election instance', async () => {
+describe('startContract', () => {
+    test('It should set the election instance when no contract is deployed', async () => {
         await startContract();
         const election = getElection();
         expect(election).toBeDefined();
     });
-});
 
-describe('startContract with a contract already deployed', () => {
-    test('It should throw an error', async () => {
+    test('It should throw an error when a contract is already deployed', async () => {
         await startContract();
         await expect(startContract()).rejects.toThrow('Election has already started');
     });

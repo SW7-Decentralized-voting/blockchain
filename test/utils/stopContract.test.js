@@ -14,10 +14,8 @@ describe('stopContract', () => {
         const election = getElection();
         expect(election).toBeNull();
     });
-});
 
-describe('stopContract with no contract deployed', () => {
-    test('It should do nothing', async () => {
+    test('It should do nothing when no contract is deployed', async () => {
         await stopContract();
         const election = getElection();
         expect(election).toBeNull();
