@@ -20,7 +20,7 @@ describe('Election Contract', function () {
     });
 
     it('Should start in the registration phase', async function () {
-        expect(await election.phase()).to.equal(0); // Registration phase
+        expect(await election.phase()).to.equal(ElectionPhase.Registration);
     });
 
     it('Should add a candidate', async function () {
