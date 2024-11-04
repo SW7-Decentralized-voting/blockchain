@@ -10,13 +10,11 @@ contract Election {
         uint id;
         string name;
         string party;
-        uint encryptedVotes; // Placeholder for homomorphic aggregation
     }
 
     struct Party {
         uint id;
         string name;
-        uint encryptedVotes; // Placeholder for homomorphic aggregation
     }
 
     struct VotingKey {
@@ -26,10 +24,10 @@ contract Election {
 
     mapping(uint => Candidate) public candidates;    // To store candidates
     mapping(uint => Party) public parties;           // To store parties
-    mapping(bytes32 => VotingKey) public votingKeys; // To store valid voting keys
+    
     uint public totalCandidates;
     uint public totalParties;
-    uint public totalUsedKeys;
+    
     
     address public electionOwner;
     string public encryptionKey;
@@ -37,9 +35,11 @@ contract Election {
     bool public isKeyPublished;
 
     // Events for vote submission and phase changes
-    event VoteCast(bytes32 key, uint entityId, bool isParty, uint encryptedVote);
+    event VoteCast(bytes encryptedVote);
     event PhaseChanged(ElectionPhase newPhase);
     event DecryptionKeyPublished(string decryptionKey);
+
+    bytes[] public encryptedVotes;
 
     // Constructor sets the contract owner (who can control election phases)
     constructor() {
@@ -62,7 +62,7 @@ contract Election {
 
     // Function to add candidates to the election
     function addCandidate(string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
-        candidates[totalCandidates] = Candidate(totalCandidates, _name, _party, 0);
+        candidates[totalCandidates] = Candidate(totalCandidates, _name, _party);
         totalCandidates++;
     }
 
@@ -76,7 +76,7 @@ contract Election {
 
     // Function to add parties to the election
     function addParty(string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
-        parties[totalParties] = Party(totalParties, _name, 0);
+        parties[totalParties] = Party(totalParties, _name);
         totalParties++;
     }
 
@@ -86,28 +86,9 @@ contract Election {
         emit PhaseChanged(ElectionPhase.Voting);
     }
 
-    function addVotingKey(bytes32 keyHash) public onlyOwner inPhase(ElectionPhase.Registration) {
-        votingKeys[keyHash] = VotingKey(true, false);
-    }
-
-    function voteWithKey(bytes32 key, uint entityId, bool isParty, uint encryptedVote) public inPhase(ElectionPhase.Voting) {
-        require(votingKeys[key].isValid, "Invalid voting key.");
-        require(!votingKeys[key].isUsed, "This key has already been used.");
-
-        // Mark the key as used
-        votingKeys[key].isUsed = true;
-        totalUsedKeys++;
-
-        // Record the vote for either candidate or party (homomorphic aggregation simulated)
-        if (isParty) {
-            require(entityId < totalParties, "Invalid party ID.");
-            parties[entityId].encryptedVotes += encryptedVote;
-        } else {
-            require(entityId < totalCandidates, "Invalid candidate ID.");
-            candidates[entityId].encryptedVotes += encryptedVote;
-        }
-
-        emit VoteCast(key, entityId, isParty, encryptedVote);
+    function castVote(bytes memory _encryptedVote) public inPhase(ElectionPhase.Voting) {
+    encryptedVotes.push(_encryptedVote);
+    emit VoteCast(_encryptedVote);
     }
 
     // Function to end the voting phase and begin tallying
@@ -142,13 +123,13 @@ contract Election {
     }
 
     // Function to get candidate details (for tallying purposes)
-    function getCandidate(uint candidateId) public view returns (string memory, string memory, uint) {
-        return (candidates[candidateId].name, candidates[candidateId].party, candidates[candidateId].encryptedVotes);
+    function getCandidate(uint candidateId) public view returns (string memory, string memory) {
+        return (candidates[candidateId].name, candidates[candidateId].party);
     }
 
     // Function to get party details (for tallying purposes)
-    function getParty(uint partyId) public view returns (string memory, uint) {
-        return (parties[partyId].name, parties[partyId].encryptedVotes);
+    function getParty(uint partyId) public view returns (string memory) {
+        return (parties[partyId].name);
     }
 
     function getParties() public view returns (Party[] memory) {
