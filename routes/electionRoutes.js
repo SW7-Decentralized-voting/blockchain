@@ -3,15 +3,9 @@ import { startElection, advanceElectionPhase } from '../controllers/election.js'
 
 const router = express.Router();
 
-router.post('/start', async (req, res, next) => {
-  await startElection(req, res, next);
-});
+router.post('/start', startElection);
 
 // Advance election phase
-router.post('/advance-phase', async (req, res, next) => {
-  await advanceElectionPhase(req, res, next);
-});
-
-
+router.post('/advance-phase', advanceElectionPhase);
 
 export default router;

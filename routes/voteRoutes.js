@@ -3,14 +3,8 @@ import { vote, getEncryptionKey } from '../controllers/vote.js';
 
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
-  vote(req, res, next);
-}
-);
+router.post('/', vote);
 
-router.get('/get-key', async (req, res, next) => {
-  getEncryptionKey(req, res, next);
-}
-);
+router.get('/get-key', getEncryptionKey);
 
 export default router;

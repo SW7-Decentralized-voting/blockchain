@@ -3,8 +3,6 @@ import { getParties } from '../controllers/party.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
-    await getParties(req, res, next);
-});
+router.get('/', getParties);
 
 export default router;

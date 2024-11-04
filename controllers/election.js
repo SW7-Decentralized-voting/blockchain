@@ -6,8 +6,7 @@ import { getKeyPair } from '../utils/encryption.js';
 import startContract from '../utils/startContract.js';
 
 async function startElection(req, res, next) {
-    const election = getElection();
-    if (election !== null) {
+    if (getElection() !== null) {
         return res.status(400).json({ error: 'Election has already started' });
     }
 
@@ -32,8 +31,7 @@ async function startElection(req, res, next) {
             await publishCandidate(candidate.name, candidate.party);
         }
 
-        
-
+        // Upload the public key to the contract
         await getElection().uploadEncryptionKey(publicKey);
 
         // Respond with a success message and the public key
