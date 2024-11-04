@@ -18,7 +18,7 @@ async function startElection(req, res, next) {
 
     try {
         // Generate a key pair for encrypting votes
-        const { publicKey, _privateKey } = await getKeyPair();
+        const { publicKey, privateKey } = await getKeyPair();
 
         // Start the contract and set the election instance
         await startContract(ABI, ABIBytecode, accounts.citizen1);
@@ -35,7 +35,7 @@ async function startElection(req, res, next) {
         await getElection().uploadEncryptionKey(publicKey);
 
         // Respond with a success message and the public key
-        res.status(200).json({ message: 'Election started successfully', publicKey });
+        res.status(200).json({ message: 'Election started successfully', privateKey });
     } catch (error) {
         next(error);
     }
