@@ -47,10 +47,43 @@ describe('Election Contract', function () {
         expect(await election.phase()).to.equal(ElectionPhase.Tallying); // Tallying phase
     });
 
+    it('Should allow uploading the encryption key in the registration phase', async function () {
+        await election.uploadEncryptionKey('key');
+        expect(await election.encryptionKey()).to.equal('key');
+    });
+
+    it('Should allow uploading the decryption key in the registration phase', async function () {
+        await election.uploadDecryptionKey('key');
+        // TODO Add a way for admins to access the decryption key before it is published
+    }
+    );
+
+    it('Should not allow uploading the encryption key if not in registration phase', async function () {
+        await election.startVotingPhase();
+        await expect(
+            election.uploadEncryptionKey('key')
+        ).to.be.revertedWith('Invalid phase for this action.');
+    }
+    );
+
+    it('Should not allow uploading the decryption key if not in registration phase', async function () {
+        await election.startVotingPhase();
+        await expect(
+            election.uploadDecryptionKey('key')
+        ).to.be.revertedWith('Invalid phase for this action.');
+    }
+    );
 
     it('Should not allow publishing the decryption key if not in tallying phase', async function () {
         await expect(
             election.publishDecryptionKey()
         ).to.be.revertedWith('Invalid phase for this action.');
     });
+
+    it('Should not allow publishing the decryption key if it has not been uploaded yet', async function () {
+        await election.startVotingPhase();
+        await election.startTallyingPhase();
+        await expect(election.publishDecryptionKey()).to.be.revertedWith('Decryption key has not been uploaded yet.');
+    }
+    );
 });

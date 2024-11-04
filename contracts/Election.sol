@@ -106,6 +106,8 @@ contract Election {
     }
 
     function publishDecryptionKey() public onlyOwner inPhase(ElectionPhase.Tallying) {
+        // Ensure the decryption key has been uploaded
+        require(bytes(decryptionKey).length > 0, "Decryption key has not been uploaded yet.");
         isKeyPublished = true; // Mark the key as published
         emit DecryptionKeyPublished(decryptionKey);
     }
