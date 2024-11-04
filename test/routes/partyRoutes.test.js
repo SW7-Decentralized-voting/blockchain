@@ -2,7 +2,6 @@ import request from 'supertest';
 import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
-import { ABI, ABIBytecode, accounts } from '../../utils/constants.js';
 import { publishParty } from '../../controllers/party.js';
 
 let router;
@@ -26,26 +25,22 @@ afterAll(() => {
     server.close();
 });
 
-describe('GET /parties with no contract deployed', () => {
-    test('It should respond with the error code 400', async () => {
+describe('GET /parties', () => {
+    test('It should respond with the error code 400 when no contract is deployed', async () => {
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election has not started' });
     });
-});
 
-describe('GET /parties with an election contract deployed but no parties', () => {
-    test('It should respond with 200', async () => {
-        await startContract(ABI, ABIBytecode, accounts.citizen1);
+    test('It should respond with 200 when an election contract is deployed but no parties', async () => {
+        await startContract();
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual([]);
     });
-});
 
-describe('GET /parties with an election contract deployed and one party added', () => {
-    test('It should respond with 200', async () => {
-        await startContract(ABI, ABIBytecode, accounts.citizen1);
+    test('It should respond with 200 when an election contract is deployed and one party added', async () => {
+        await startContract();
         await publishParty('Party 1');
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);

@@ -1,12 +1,17 @@
 import pkg from 'hardhat';
-import { setElection } from './electionManager.js';
+import { getElection, setElection } from './electionManager.js';
+import { ABI, ABIBytecode, accounts } from './constants.js';
 const { ethers } = pkg;
 
-async function startContract(ABI, bytecode, wallet) {
+async function startContract() {
+  if (getElection() !== null) {
+    throw new Error('Election has already started');
+  }
+  
   const ElectionFactory = new ethers.ContractFactory(
     ABI,
-    bytecode,
-    wallet
+    ABIBytecode,
+    accounts.citizen1
   );
 
   try {
@@ -14,6 +19,7 @@ async function startContract(ABI, bytecode, wallet) {
     setElection(election);
   }
   catch (error) {
+    // eslint-disable-next-line no-console
     console.error('There was an error deploying the contract: ', error.message);
   }
 
