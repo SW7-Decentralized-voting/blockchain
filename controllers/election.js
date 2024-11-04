@@ -35,8 +35,7 @@ async function startElection(req, res, next) {
         await getElection().uploadEncryptionKey(publicKey);
 
         // Respond with a success message and the public key
-        //res.status(200).json({ message: 'Election started successfully', publicKeyString });
-        res.status(200).json({ message: 'Election started successfully' });
+        res.status(200).json({ message: 'Election started successfully', publicKey });
     } catch (error) {
         next(error);
     }
