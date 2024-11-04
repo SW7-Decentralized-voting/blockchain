@@ -1,5 +1,5 @@
-import { getElection } from '../utils/electionManager';
-import { ElectionPhase } from '../utils/constants';
+import { getElection } from '../utils/electionManager.js';
+import { ElectionPhase } from '../utils/constants.js';
 
 async function vote(req, res, next) {
     const election = getElection();
@@ -26,7 +26,7 @@ async function vote(req, res, next) {
 async function getEncryptionKey(req, res, next) {
     const election = getElection();
     try {
-        const encryptionKey = await election.getEncryptionKey();
+        const encryptionKey = await election.encryptionKey();
         res.json(encryptionKey);
     } catch (error) {
         next(error);

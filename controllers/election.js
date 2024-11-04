@@ -33,9 +33,6 @@ async function startElection(req, res, next) {
 
         //await election.uploadEncryptionKey(publicKeyString);
 
-        // Upload the serialized private key to the smart contract
-        //await election.uploadDecryptionKey(privateKeyString);
-
         // Respond with a success message and the public key
         //res.status(200).json({ message: 'Election started successfully', publicKeyString });
         res.status(200).json({ message: 'Election started successfully' });
@@ -61,6 +58,11 @@ async function advanceElectionPhase(req, res, next) {
         if (currentPhase === ElectionPhase.Voting) {
             const tx = await election.startTallyingPhase();
             await tx.wait();
+
+            // TODO Store the decryption key in a secure location and upload it during the tallying phase
+            //const tx2 = await election.uploadDecryptionKey();
+            //await tx2.wait();
+            //res.json({ message: 'Election phase advanced to tallying phase', transactionHash: tx.hash, transactionHash2: tx2.hash });
             res.json({ message: 'Election phase advanced to tallying phase', transactionHash: tx.hash });
         }
         if (currentPhase === ElectionPhase.Tallying) {

@@ -1,17 +1,11 @@
 import express from 'express';
-import { vote, getEncryptionKey } from '../controllers/vote';
+import { vote, getEncryptionKey } from '../controllers/vote.js';
 
 const router = express.Router();
 
 router.post('/', async (req, res, next) => {
-  const { encryptedVote } = req.body;
-
   try {
-    const tx = await vote(encryptedVote);
-    res.json({
-      message: 'Vote cast successfully',
-      transactionHash: tx.hash
-    });
+    await vote(req, res, next);
   } catch (error) {
     next(error);
   }
