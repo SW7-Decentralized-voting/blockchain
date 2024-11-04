@@ -13,12 +13,7 @@ router.post('/', async (req, res, next) => {
 );
 
 router.get('/get-key', async (req, res, next) => {
-  try {
-    const encryptionKey = await getEncryptionKey();
-    res.json(encryptionKey);
-  } catch (error) {
-    next(error);
-  }
+  getEncryptionKey(req, res, next);
 }
 );
 

@@ -2,11 +2,12 @@ import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js
 import { getElection } from '../utils/electionManager.js';
 import { publishParty } from '../controllers/party.js';
 import { publishCandidate } from '../controllers/candidate.js';
-//import { generateKeyPair } from '../utils/encryption.js';
+import { getKeyPair } from '../utils/encryption.js';
 import startContract from '../utils/startContract.js';
 
 async function startElection(req, res, next) {
-    if (getElection() !== null) {
+    const election = getElection();
+    if (election !== null) {
         return res.status(400).json({ error: 'Election has already started' });
     }
 
@@ -17,8 +18,8 @@ async function startElection(req, res, next) {
     }
 
     try {
-        // Generate a key pair for homomorphic encryption
-        //const { publicKey, privateKey } = await generateKeyPair();
+        // Generate a key pair for encrypting votes
+        const { publicKey, _privateKey } = await getKeyPair();
 
         // Start the contract and set the election instance
         await startContract(ABI, ABIBytecode, accounts.citizen1);
@@ -31,7 +32,9 @@ async function startElection(req, res, next) {
             await publishCandidate(candidate.name, candidate.party);
         }
 
-        //await election.uploadEncryptionKey(publicKeyString);
+        
+
+        await getElection().uploadEncryptionKey(publicKey);
 
         // Respond with a success message and the public key
         //res.status(200).json({ message: 'Election started successfully', publicKeyString });
