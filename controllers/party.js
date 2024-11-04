@@ -38,6 +38,7 @@ async function publishParty(name) {
 
         return tx.hash;
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
     }
 }
