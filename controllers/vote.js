@@ -3,6 +3,11 @@ import { ElectionPhase } from '../utils/constants.js';
 
 async function vote(req, res, next) {
     const election = getElection();
+
+    if (election === null) {
+        return res.status(400).json({ error: 'Election has not started' });
+    }
+
     const { encryptedVote } = req.body;
 
     try {
@@ -24,6 +29,10 @@ async function vote(req, res, next) {
 }
 
 async function getEncryptionKey(req, res, next) {
+    if (getElection() === null) {
+        return res.status(400).json({ error: 'Election has not started' });
+    }
+
     const election = getElection();
     try {
         const encryptionKey = await election.encryptionKey();

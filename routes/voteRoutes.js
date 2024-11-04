@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/', vote);
 
-router.get('/get-key', getEncryptionKey);
+router.get('/encryption-key', getEncryptionKey);
 
 export default router;

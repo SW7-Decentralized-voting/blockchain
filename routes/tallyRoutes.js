@@ -4,7 +4,7 @@ import { ElectionPhase } from '../utils/constants.js';
 
 const router = express.Router();
 
-// TODO Judge whether this route is necessary since we are generating the key pair in the startElection function
+// TODO: Judge whether this route is necessary since we are storing the decryption key in the database after generation
 router.get('/get-key', async (req, res, next) => {
     const election = getElection();
     if (election === null) {
