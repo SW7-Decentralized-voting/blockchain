@@ -141,4 +141,8 @@ contract Election {
         }
         return partyList;
     }
+
+    function getEncryptedVotes() public view returns (bytes[] memory) {
+        return encryptedVotes;
+    }
 }
