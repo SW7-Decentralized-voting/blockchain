@@ -84,7 +84,7 @@ contract Election {
         emit PhaseChanged(ElectionPhase.Voting);
     }
 
-    function castVote(bytes memory _encryptedVote) public inPhase(ElectionPhase.Voting) {
+    function castVote(bytes memory _encryptedVote) public onlyOwner inPhase(ElectionPhase.Voting) {
     encryptedVotes.push(_encryptedVote);
     emit VoteCast(_encryptedVote);
     }
