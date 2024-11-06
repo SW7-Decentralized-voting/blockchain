@@ -36,10 +36,10 @@ describe('Election Routes', () => {
         test('It should respond with 200 when no election contract is deployed with candidates and parties', async () => {
             const body = {
                 'candidates': [
-                    { 'name': 'Johan', 'party': 'democrats' }
+                    { 'objectId': '0x0', 'name': 'Johan', 'party': 'democrats' }
                 ],
                 'parties': [
-                    { 'name': 'democrats' }
+                    { 'objectId': '0x1','name': 'democrats' }
                 ],
                 'publicKey': 'key'
             };
@@ -52,10 +52,10 @@ describe('Election Routes', () => {
             await startContract();
             const body = {
                 'candidates': [
-                    { 'name': 'Johan', 'party': 'democrats' }
+                    { 'objectId': '0x0','name': 'Johan', 'party': 'democrats' }
                 ],
                 'parties': [
-                    { 'name': 'democrats' }
+                    { 'objectId': '0x1','name': 'democrats' }
                 ]
             };
             const response = await request(server).post(baseRoute + '/start').send(body);
@@ -74,10 +74,10 @@ describe('Election Routes', () => {
         test('It should respond with 200 when an election contract is deployed and in registration phase', async () => {
             const body = {
                 'candidates': [
-                    { 'name': 'Johan', 'party': 'democrats' }
+                    { 'objectId': '0x0', 'name': 'Johan', 'party': 'democrats' }
                 ],
                 'parties': [
-                    { 'name': 'democrats' }
+                    { 'objectId': '0x1', 'name': 'democrats' }
                 ]
             };
             await request(server).post(baseRoute + '/start').send(body);
@@ -89,10 +89,10 @@ describe('Election Routes', () => {
         test('It should respond with 200 when an election contract is deployed and in voting phase', async () => {
             const body = {
                 'candidates': [
-                    { 'name': 'Johan', 'party': 'democrats' }
+                    { 'objectId': '0x0', 'name': 'Johan', 'party': 'democrats' }
                 ],
                 'parties': [
-                    { 'name': 'democrats' }
+                    { 'objectId': '0x1', 'name': 'democrats' }
                 ]
             };
             await request(server).post(baseRoute + '/start').send(body);
@@ -105,10 +105,10 @@ describe('Election Routes', () => {
         test('It should respond with 400 when an election contract is deployed and in tallying phase', async () => {
             const body = {
                 'candidates': [
-                    { 'name': 'Johan', 'party': 'democrats' }
+                    { 'objectId': '0x0', 'name': 'Johan', 'party': 'democrats' }
                 ],
                 'parties': [
-                    { 'name': 'democrats' }
+                    { 'objectId': '0x1', 'name': 'democrats' }
                 ]
             };
             await request(server).post(baseRoute + '/start').send(body);

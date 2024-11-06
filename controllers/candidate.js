@@ -17,13 +17,13 @@ async function getCandidates(req, res, next) {
     }
 }
 
-async function publishCandidate(name, party) {
+async function publishCandidate(objectId, name, party) {
     const election = getElection();
     if (election === null) {
         throw new Error('Election has not started');
     }
 
-    if (!name || !party) {
+    if (!objectId || !name || !party) {
         throw new Error('Candidate name and party are required');
     }
 
@@ -33,7 +33,7 @@ async function publishCandidate(name, party) {
             throw new Error('Candidates can only be added during the registration phase');
         }
 
-        const tx = await election.addCandidate(name, party);
+        const tx = await election.addCandidate(objectId, name, party);
         await tx.wait();
 
         return tx.hash;

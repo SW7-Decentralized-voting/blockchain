@@ -25,21 +25,23 @@ describe('Election Contract', function () {
 
     it('Should not allow non-owners to add a candidate', async function () {
         await expect(
-            election.connect(_addr1).addCandidate('Alice', 'PartyA')
+            election.connect(_addr1).addCandidate('0x0', 'Alice', 'PartyA')
         ).to.be.revertedWith('Only the election owner can perform this action.');
     }
     );
 
     it('Should add a candidate', async function () {
-        await election.addCandidate('Alice', 'PartyA');
+        await election.addCandidate('0x0', 'Alice', 'PartyA');
         const candidate = await election.candidates(0);
+        expect(candidate.objectId).to.equal('0x0');
         expect(candidate.name).to.equal('Alice');
         expect(candidate.party).to.equal('PartyA');
     });
 
     it('Should add a party', async function () {
-        await election.addParty('PartyA');
+        await election.addParty('0x0', 'PartyA');
         const party = await election.parties(0);
+        expect(party.objectId).to.equal('0x0');
         expect(party.name).to.equal('PartyA');
     });
 
