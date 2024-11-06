@@ -44,6 +44,6 @@ describe('GET /parties', () => {
         await publishParty('Party 1');
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual([['0', 'Party 1', '0']]);
+        expect(response.body).toEqual([['0', 'Party 1']]);
     });
 });

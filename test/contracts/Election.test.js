@@ -20,8 +20,15 @@ describe('Election Contract', function () {
     });
 
     it('Should start in the registration phase', async function () {
-        expect(await election.phase()).to.equal(0); // Registration phase
+        expect(await election.phase()).to.equal(ElectionPhase.Registration);
     });
+
+    it('Should not allow non-owners to add a candidate', async function () {
+        await expect(
+            election.connect(_addr1).addCandidate('Alice', 'PartyA')
+        ).to.be.revertedWith('Only the election owner can perform this action.');
+    }
+    );
 
     it('Should add a candidate', async function () {
         await election.addCandidate('Alice', 'PartyA');
@@ -47,10 +54,31 @@ describe('Election Contract', function () {
         expect(await election.phase()).to.equal(ElectionPhase.Tallying); // Tallying phase
     });
 
-
-    it('Should not allow publishing the decryption key if not in tallying phase', async function () {
-        await expect(
-            election.publishDecryptionKey()
-        ).to.be.revertedWith('Invalid phase for this action.');
+    it('Should allow uploading the encryption key in the registration phase', async function () {
+        await election.uploadEncryptionKey('key');
+        expect(await election.encryptionKey()).to.equal('key');
     });
+
+    it('Should allow uploading the decryption key in the tallying phase', async function () {
+        await election.startVotingPhase();
+        await election.startTallyingPhase();
+        await election.uploadDecryptionKey('key');
+        expect(await election.decryptionKey()).to.equal('key');
+    }
+    );
+
+    it('Should not allow uploading the encryption key if not in registration phase', async function () {
+        await election.startVotingPhase();
+        await expect(
+            election.uploadEncryptionKey('key')
+        ).to.be.revertedWith('Invalid phase for this action.');
+    }
+    );
+
+    it('Should not allow uploading the decryption key if not in tallying phase', async function () {
+        await expect(
+            election.uploadDecryptionKey('key')
+        ).to.be.revertedWith('Invalid phase for this action.');
+    }
+    );
 });

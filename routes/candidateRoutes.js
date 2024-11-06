@@ -3,8 +3,7 @@ import { getCandidates } from '../controllers/candidate.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
-    await getCandidates(req, res, next);
-});
+// Fetch candidates from contract
+router.get('/', getCandidates);
 
 export default router;

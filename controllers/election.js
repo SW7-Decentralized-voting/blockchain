@@ -2,7 +2,6 @@ import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js
 import { getElection } from '../utils/electionManager.js';
 import { publishParty } from '../controllers/party.js';
 import { publishCandidate } from '../controllers/candidate.js';
-//import { generateKeyPair } from '../utils/encryption.js';
 import startContract from '../utils/startContract.js';
 
 async function startElection(req, res, next) {
@@ -17,8 +16,8 @@ async function startElection(req, res, next) {
     }
 
     try {
-        // Generate a key pair for homomorphic encryption
-        //const { publicKey, privateKey } = await generateKeyPair();
+
+        const publicKey = req.body.publicKey;
 
         // Start the contract and set the election instance
         await startContract(ABI, ABIBytecode, accounts.citizen1);
@@ -31,14 +30,11 @@ async function startElection(req, res, next) {
             await publishCandidate(candidate.name, candidate.party);
         }
 
-        //await election.uploadEncryptionKey(publicKeyString);
-
-        // Upload the serialized private key to the smart contract
-        //await election.uploadDecryptionKey(privateKeyString);
+        // Upload the public key to the contract
+        await getElection().uploadEncryptionKey(publicKey);
 
         // Respond with a success message and the public key
-        //res.status(200).json({ message: 'Election started successfully', publicKeyString });
-        res.status(200).json({ message: 'Election started successfully' });
+        res.status(200).json({ message: 'Election started successfully'});
     } catch (error) {
         next(error);
     }
@@ -61,6 +57,11 @@ async function advanceElectionPhase(req, res, next) {
         if (currentPhase === ElectionPhase.Voting) {
             const tx = await election.startTallyingPhase();
             await tx.wait();
+
+            // TODO Store the decryption key in a secure location and upload it during the tallying phase
+            //const tx2 = await election.uploadDecryptionKey();
+            //await tx2.wait();
+            //res.json({ message: 'Election phase advanced to tallying phase', transactionHash: tx.hash, transactionHash2: tx2.hash });
             res.json({ message: 'Election phase advanced to tallying phase', transactionHash: tx.hash });
         }
         if (currentPhase === ElectionPhase.Tallying) {
