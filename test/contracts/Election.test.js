@@ -63,7 +63,7 @@ describe('Election Contract', function () {
         await election.startVotingPhase();
         await election.startTallyingPhase();
         await election.uploadDecryptionKey('key');
-        // TODO Add a way for admins to access the decryption key before it is published
+        expect(await election.decryptionKey()).to.equal('key');
     }
     );
 
