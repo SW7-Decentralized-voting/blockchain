@@ -23,8 +23,6 @@ describe('Election Contract', function () {
         expect(await election.phase()).to.equal(ElectionPhase.Registration);
     });
 
-    // Only the owner can add a candidate
-
     it('Should not allow non-owners to add a candidate', async function () {
         await expect(
             election.connect(_addr1).addCandidate('Alice', 'PartyA')

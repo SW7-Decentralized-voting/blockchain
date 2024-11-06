@@ -49,7 +49,7 @@ router.post('/upload-key', async (req, res, next) => {
 }
 );
 
-router.get('/get-encrypted-votes', async (req, res, next) => {
+router.get('/encrypted-votes', async (req, res, next) => {
     const election = getElection();
     if (election === null) {
         return res.status(400).json({ error: 'Election has not started' });

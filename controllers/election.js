@@ -2,7 +2,6 @@ import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js
 import { getElection } from '../utils/electionManager.js';
 import { publishParty } from '../controllers/party.js';
 import { publishCandidate } from '../controllers/candidate.js';
-import { getKeyPair } from '../utils/encryption.js';
 import startContract from '../utils/startContract.js';
 
 async function startElection(req, res, next) {
@@ -17,8 +16,8 @@ async function startElection(req, res, next) {
     }
 
     try {
-        // Generate a key pair for encrypting votes
-        const { publicKey, privateKey } = await getKeyPair();
+
+        const publicKey = req.body.publicKey;
 
         // Start the contract and set the election instance
         await startContract(ABI, ABIBytecode, accounts.citizen1);
@@ -35,7 +34,7 @@ async function startElection(req, res, next) {
         await getElection().uploadEncryptionKey(publicKey);
 
         // Respond with a success message and the public key
-        res.status(200).json({ message: 'Election started successfully', privateKey });
+        res.status(200).json({ message: 'Election started successfully'});
     } catch (error) {
         next(error);
     }

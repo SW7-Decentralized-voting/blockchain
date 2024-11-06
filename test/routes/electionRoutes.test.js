@@ -40,11 +40,12 @@ describe('Election Routes', () => {
                 ],
                 'parties': [
                     { 'name': 'democrats' }
-                ]
+                ],
+                'publicKey': 'key'
             };
             const response = await request(server).post(baseRoute + '/start').send(body);
             expect(response.statusCode).toBe(200);
-            expect(response.body).toEqual({ message: 'Election started successfully', privateKey: expect.any(String) });
+            expect(response.body).toEqual({ message: 'Election started successfully'});
         });
 
         test('It should respond with 400 when an election contract is already deployed', async () => {
