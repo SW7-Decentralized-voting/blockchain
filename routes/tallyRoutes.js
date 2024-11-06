@@ -4,26 +4,6 @@ import { ElectionPhase } from '../utils/constants.js';
 
 const router = express.Router();
 
-// TODO: Judge whether this route is necessary since we are storing the decryption key in the database after generation
-router.get('/get-key', async (req, res, next) => {
-    const election = getElection();
-    if (election === null) {
-        return res.status(400).json({ error: 'Election has not started' });
-    }
-
-    if (await election.phase() !== ElectionPhase.Tallying) {
-        return res.status(400).json({ error: 'Election is not in the tallying phase' });
-    }
-
-    try {
-        const decryptionKey = await election.decryptionKey();
-        res.json(decryptionKey);
-    } catch (error) {
-        next(error);
-    }
-}
-);
-
 router.post('/upload-key', async (req, res, next) => {
     const election = getElection();
     if (election === null) {
