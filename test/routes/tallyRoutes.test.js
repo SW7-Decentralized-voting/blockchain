@@ -2,9 +2,8 @@ import request from 'supertest';
 import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
-import { startElection } from '../../controllers/election.js';
 import { getElection } from '../../utils/electionManager.js';
-import { jest } from '@jest/globals';
+
 
 let router;
 const baseRoute = '/tally';
