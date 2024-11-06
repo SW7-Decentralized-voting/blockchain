@@ -37,7 +37,6 @@ contract Election {
     event VoteCast(bytes encryptedVote);
     event PhaseChanged(ElectionPhase newPhase);
 
-
     bytes[] public encryptedVotes;
 
     // Constructor sets the contract owner (who can control election phases)

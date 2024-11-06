@@ -45,13 +45,13 @@ describe('Election Contract', function () {
 
     it('Should transition to voting phase', async function () {
         await election.startVotingPhase();
-        expect(await election.phase()).to.equal(ElectionPhase.Voting); // Voting phase
+        expect(await election.phase()).to.equal(ElectionPhase.Voting);
     });
 
     it('Should transition to tallying phase', async function () {
         await election.startVotingPhase();
         await election.startTallyingPhase();
-        expect(await election.phase()).to.equal(ElectionPhase.Tallying); // Tallying phase
+        expect(await election.phase()).to.equal(ElectionPhase.Tallying);
     });
 
     it('Should allow uploading the encryption key in the registration phase', async function () {
