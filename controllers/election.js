@@ -73,4 +73,20 @@ async function advanceElectionPhase(req, res, next) {
     }
 }
 
-export { startElection, advanceElectionPhase };
+async function getCurrentPhase(req, res, next) {
+    const election = getElection();
+    if (election === null) {
+        return res.status(400).json({ error: 'Election has not started' });
+    }
+
+    try {
+        const currentPhase = await election.phase();
+        const serializedPhase = currentPhase.toString();
+        res.json({ currentPhase: serializedPhase });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+export { startElection, advanceElectionPhase, getCurrentPhase };

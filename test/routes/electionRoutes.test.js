@@ -2,6 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
+import { ElectionPhase } from '../../utils/constants.js';
 
 let router;
 const baseRoute = '/election';
@@ -117,6 +118,21 @@ describe('Election Routes', () => {
             const response = await request(server).post(baseRoute + '/advance-phase');
             expect(response.statusCode).toBe(400);
             expect(response.body).toEqual({ error: 'Election has already ended' });
+        });
+    });
+
+    describe('GET /election/current-phase', () => {
+        test('It should respond with 400 when no election contract is deployed', async () => {
+            const response = await request(server).get(baseRoute + '/current-phase');
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual({ error: 'Election has not started' });
+        });
+
+        test('It should respond with 200 when an election contract is deployed', async () => {
+            await startContract();
+            const response = await request(server).get(baseRoute + '/current-phase');
+            expect(response.statusCode).toBe(200);
+            expect(response.body).toEqual({ currentPhase: ElectionPhase.Registration.toString() });
         });
     });
 });
