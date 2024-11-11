@@ -17,7 +17,7 @@ async function getParties(req, res, next) {
     }
 }
 
-async function publishParty(name) {
+async function publishParty(objectId, name) {
     const election = getElection();
     if (election === null) {
         throw new Error('Election has not started');
@@ -33,7 +33,7 @@ async function publishParty(name) {
             throw new Error('Parties can only be added during the registration phase');
         }
 
-        const tx = await election.addParty(name);
+        const tx = await election.addParty(objectId, name);
         await tx.wait();
 
         return tx.hash;

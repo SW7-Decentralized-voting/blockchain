@@ -41,9 +41,9 @@ describe('GET /parties', () => {
 
     test('It should respond with 200 when an election contract is deployed and one party added', async () => {
         await startContract();
-        await publishParty('Party 1');
+        await publishParty('deadbeef', 'Party 1');
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual([['0', 'Party 1']]);
+        expect(response.body).toEqual([['0', 'deadbeef', 'Party 1']]);
     });
 });
