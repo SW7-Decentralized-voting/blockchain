@@ -24,7 +24,7 @@ async function publishCandidate(objectId, name, party) {
     }
 
     if (!objectId || !name || !party) {
-        throw new Error('Candidate name and party are required');
+        throw new Error('objectId, candidate name and party are required');
     }
 
     try {
