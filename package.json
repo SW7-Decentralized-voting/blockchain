@@ -1,16 +1,39 @@
 {
-  "name": "blockchain",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.13"
-  }
+    "name": "blockchain",
+    "version": "1.0.0",
+    "description": "",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "test": "npx hardhat compile && cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest && npx hardhat test test/contracts/*.test.js",
+        "dev": "concurrently -k \"npx hardhat compile && npx hardhat node\" \"wait-on http://localhost:8545/ && nodemon index.js\"",
+        "lint": "eslint ."
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+        "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+        "cross-env": "^7.0.3",
+        "eslint": "^9.13.0",
+        "eslint-plugin-jest": "^28.8.3",
+        "hardhat": "^2.22.14",
+        "jest": "^29.7.0",
+        "nodemon": "^3.1.7",
+        "supertest": "^7.0.0",
+        "wait-on": "^8.0.1"
+    },
+    "dependencies": {
+        "@ethersproject/hdnode": "^5.7.0",
+        "concurrently": "^9.0.1",
+        "ethers": "^6.13.3",
+        "express": "^4.21.1"
+    },
+    "jest": {
+        "testPathIgnorePatterns": [
+            "/node_modules/",
+            "test/contracts/"
+        ]
+    }
 }
