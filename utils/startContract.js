@@ -3,6 +3,9 @@ import { getElection, setElection } from './electionManager.js';
 import { ABI, ABIBytecode, accounts } from './constants.js';
 const { ethers } = pkg;
 
+/**
+ * Start the election by deploying the contract to the blockchain
+ */
 async function startContract() {
   if (getElection() !== null) {
     throw new Error('Election has already started');
