@@ -20,5 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm i
 
+      - name: Compile Hardhat
+        run: npx hardhat compile
+
       - name: Run Jest tests
         run: npm run test
