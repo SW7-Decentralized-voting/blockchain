@@ -83,4 +83,12 @@ describe('Election Contract', function () {
         ).to.be.revertedWith('Invalid phase for this action.');
     }
     );
+
+    it('Should allow voting', async function () {
+        await election.startVotingPhase();
+        await election.castVote('0x1234567890abcdef');
+        const vote = await election.getEncryptedVotes();
+        expect(vote[0]).to.equal('0x1234567890abcdef');
+    }
+    );
 });
