@@ -5,7 +5,8 @@
     "type": "module",
     "main": "index.js",
     "scripts": {
-        "test": "npx hardhat compile && cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest && npx hardhat test test/contracts/*.test.js",
+        "test": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest",
+        "hardhat-test": "npx hardhat compile && npx hardhat test test/contracts/*.test.js",
         "dev": "concurrently -k \"npx hardhat compile && npx hardhat node\" \"wait-on http://localhost:8545/ && nodemon index.js\"",
         "lint": "eslint ."
     },
