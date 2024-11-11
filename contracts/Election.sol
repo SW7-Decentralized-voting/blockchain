@@ -2,18 +2,19 @@
 pragma solidity ^0.8.27;
 
 contract Election {
-    // Election Phases
     enum ElectionPhase { Registration, Voting, Tallying }
     ElectionPhase public phase;
 
     struct Candidate {
         uint id;
+        string objectId;
         string name;
         string party;
     }
 
     struct Party {
         uint id;
+        string objectId;
         string name;
     }
 
@@ -33,34 +34,28 @@ contract Election {
     string public encryptionKey;
     string public decryptionKey;
 
-    // Events for vote submission and phase changes
     event VoteCast(bytes encryptedVote);
     event PhaseChanged(ElectionPhase newPhase);
 
-
     bytes[] public encryptedVotes;
 
-    // Constructor sets the contract owner (who can control election phases)
     constructor() {
         electionOwner = msg.sender;
         phase = ElectionPhase.Registration; // Start in the registration phase
     }
 
-    // Modifier to restrict certain actions to the owner (election controller)
     modifier onlyOwner() {
         require(msg.sender == electionOwner, "Only the election owner can perform this action.");
         _;
     }
 
-    // Modifier to check if the current phase matches the required phase
     modifier inPhase(ElectionPhase requiredPhase) {
         require(phase == requiredPhase, "Invalid phase for this action.");
         _;
     }
 
-    // Function to add candidates to the election
-    function addCandidate(string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
-        candidates[totalCandidates] = Candidate(totalCandidates, _name, _party);
+    function addCandidate(string memory _objectId, string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
+        candidates[totalCandidates] = Candidate(totalCandidates, _objectId, _name, _party);
         totalCandidates++;
     }
 
@@ -72,13 +67,11 @@ contract Election {
         return candidateList;
     }
 
-    // Function to add parties to the election
-    function addParty(string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
-        parties[totalParties] = Party(totalParties, _name);
+    function addParty(string memory _objectId, string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
+        parties[totalParties] = Party(totalParties, _objectId, _name);
         totalParties++;
     }
 
-    // Function to start the voting phase
     function startVotingPhase() public onlyOwner inPhase(ElectionPhase.Registration) {
         phase = ElectionPhase.Voting;
         emit PhaseChanged(ElectionPhase.Voting);
@@ -89,7 +82,6 @@ contract Election {
     emit VoteCast(_encryptedVote);
     }
 
-    // Function to end the voting phase and begin tallying
     function startTallyingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
         phase = ElectionPhase.Tallying;
         emit PhaseChanged(ElectionPhase.Tallying);
@@ -103,12 +95,10 @@ contract Election {
         decryptionKey = key;
     }
 
-    // Function to get candidate details (for tallying purposes)
     function getCandidate(uint candidateId) public view returns (string memory, string memory) {
         return (candidates[candidateId].name, candidates[candidateId].party);
     }
 
-    // Function to get party details (for tallying purposes)
     function getParty(uint partyId) public view returns (string memory) {
         return (parties[partyId].name);
     }

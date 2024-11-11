@@ -23,11 +23,11 @@ async function startElection(req, res, next) {
         await startContract(ABI, ABIBytecode, accounts.citizen1);
 
         for (const party of parties) {
-            await publishParty(party.name);
+            await publishParty(party.objectId, party.name);
         }
 
         for (const candidate of candidates) {
-            await publishCandidate(candidate.name, candidate.party);
+            await publishCandidate(candidate.objectId, candidate.name, candidate.party);
         }
 
         // Upload the public key to the contract
@@ -73,4 +73,20 @@ async function advanceElectionPhase(req, res, next) {
     }
 }
 
-export { startElection, advanceElectionPhase };
+async function getCurrentPhase(req, res, next) {
+    const election = getElection();
+    if (election === null) {
+        return res.status(400).json({ error: 'Election has not started' });
+    }
+
+    try {
+        const currentPhase = await election.phase();
+        const serializedPhase = currentPhase.toString();
+        res.json({ currentPhase: serializedPhase });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+export { startElection, advanceElectionPhase, getCurrentPhase };
