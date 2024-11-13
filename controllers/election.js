@@ -4,6 +4,13 @@ import { publishParty } from '../controllers/party.js';
 import { publishCandidate } from '../controllers/candidate.js';
 import startContract from '../utils/startContract.js';
 
+/**
+ * Start the election by uploading the public key and the list of candidates and parties
+ * @param {Request} req Express request object. Should contain the list of candidates and parties
+ * @param {Response} res Express response object
+ * @param {NextFunction} next Express next function (error handler) 
+ * @returns {Response} Express response object with a success message or an error message
+ */
 async function startElection(req, res, next) {
     if (getElection() !== null) {
         return res.status(400).json({ error: 'Election has already started' });
@@ -40,6 +47,13 @@ async function startElection(req, res, next) {
     }
 }
 
+/**
+ * Advance the election phase to the next phase
+ * @param {Request} req Express request object 
+ * @param {Response} res Express response object
+ * @param {NextFunction} next Express next function (error handler)
+ * @returns {Response} Express response object with a success message or an error message
+ */
 async function advanceElectionPhase(req, res, next) {
     const election = getElection();
     if (election === null) {
@@ -73,6 +87,13 @@ async function advanceElectionPhase(req, res, next) {
     }
 }
 
+/**
+ * Get the current phase of the election from the contract (blockchain)
+ * @param {Request} req Express request object
+ * @param {Response} res Express response object
+ * @param {NextFunction} next Express next function (error handler)
+ * @returns {Response} Express response object with the current phase of the election
+ */
 async function getCurrentPhase(req, res, next) {
     const election = getElection();
     if (election === null) {
@@ -90,3 +111,7 @@ async function getCurrentPhase(req, res, next) {
 
 
 export { startElection, advanceElectionPhase, getCurrentPhase };
+
+/**
+ * @import { Request, Response, NextFunction } from 'express';
+ */

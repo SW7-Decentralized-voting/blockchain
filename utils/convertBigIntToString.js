@@ -1,3 +1,8 @@
+/**
+ * Converts BigInt to string for JSON serialization
+ * @param {BigInt|Array|Object} obj Object to convert to string (if BigInt)
+ * @returns {String|Array|Object} Object with BigInts converted to strings
+ */
 function convertBigIntToString(obj) {
     if (typeof obj === 'bigint') {
         return obj.toString();

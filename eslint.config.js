@@ -1,10 +1,12 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import jest from "eslint-plugin-jest";
+import jsdoc from "eslint-plugin-jsdoc";
 
 
 export default [
   {
+    plugins: { jsdoc },
     rules: {
       "semi": ["error", "always"],
       "quotes": ["error", "single"],
@@ -15,6 +17,8 @@ export default [
       "no-unreachable": "error",
       "no-constant-condition": "error",
       "no-empty": "error",
+      ...jsdoc.configs.recommended.rules,
+      "jsdoc/check-types": "off"
     },
     ignores: ["node_modules/", "eslint.config.js"],
     languageOptions: {

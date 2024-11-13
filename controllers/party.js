@@ -2,6 +2,13 @@ import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
 import convertBigIntToString from '../utils/convertBigIntToString.js';
 
+/**
+ * Get all parties in the election contract
+ * @param {Request} req Express request object
+ * @param {Response} res Express response object
+ * @param {NextFunction} next Express next function (error handler)
+ * @returns {Response} Express response object with a list of parties
+ */
 async function getParties(req, res, next) {
     const election = getElection();
     if (election === null) {
@@ -17,6 +24,12 @@ async function getParties(req, res, next) {
     }
 }
 
+/**
+ * Publish a party to the blockchain
+ * @param {String} objectId mongoose object id of the party
+ * @param {String} name The name of the party
+ * @returns {String} Transaction hash
+ */
 async function publishParty(objectId, name) {
     const election = getElection();
     if (election === null) {
@@ -43,6 +56,8 @@ async function publishParty(objectId, name) {
     }
 }
 
-
-
 export { getParties, publishParty };
+
+/**
+ * @import { Request, Response, NextFunction } from 'express'; 
+ */
