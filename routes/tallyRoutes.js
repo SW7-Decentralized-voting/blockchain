@@ -1,6 +1,7 @@
 import express from 'express';
 import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
+import { decryptAndTallyVotes } from '../controllers/tallying.js';
 
 const router = express.Router();
 
@@ -43,8 +44,13 @@ router.get('/encrypted-votes', async (req, res, next) => {
         const result = await election.getEncryptedVotes();
         res.json(result);
     } catch (error) {
-        next(error);
+        return res.status(500).json({ error: 'Error getting encrypted votes' });
     }
+}
+);
+
+router.get('/', async (req, res, next) => {
+    decryptAndTallyVotes(req, res, next);
 }
 );
 

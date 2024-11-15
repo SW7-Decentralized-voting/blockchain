@@ -9,7 +9,7 @@ import startContract from '../utils/startContract.js';
  * @param {Request} req Express request object. Should contain the list of candidates and parties
  * @param {Response} res Express response object
  * @param {NextFunction} next Express next function (error handler) 
- * @returns {Response} Express response object with a success message or an error message
+ * @returns {Promise<Response>} Express response object with a success message or an error message
  */
 async function startElection(req, res, next) {
     if (getElection() !== null) {

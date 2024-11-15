@@ -1,14 +1,14 @@
 import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
 import { Buffer } from 'buffer';
-import { publicEncrypt } from 'crypto';
+import { privateDecrypt, publicEncrypt } from 'crypto';
 
 /**
  * Cast a vote in the election contract
  * @param {Request} req Express request object. Should contain the id of the candidate or party to vote for (or blank id)
  * @param {Response} res Express response object
  * @param {NextFunction} next Express next function (error handler)
- * @returns {Response} Express response object with a success message or an error message
+ * @returns {Promise<Response>} Express response object with a success message or an error message
  */
 async function vote(req, res, next) {
     const election = getElection();
@@ -45,7 +45,8 @@ async function vote(req, res, next) {
             transactionHash: tx.hash
         });
     } catch (error) {
-        next(error);
+        console.error(error);
+        return res.status(500).json({ error: 'Error casting vote' });
     }
 }
 
