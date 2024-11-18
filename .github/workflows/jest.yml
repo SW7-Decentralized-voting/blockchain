@@ -24,3 +24,6 @@ jobs:
 
       - name: Run Jest tests
         run: npm run test
+    env:
+      GITHUB_ACTIONS: true
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
