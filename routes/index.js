@@ -5,6 +5,7 @@ import partyRoutes from './partyRoutes.js';
 import voteRoutes from './voteRoutes.js';
 import tallyRoutes from './tallyRoutes.js';
 import errorHandler from '../middleware/errorHandler.js';
+import keyVerificationRoutes from './keyVerificationRoutes.js';
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.use('/candidates', candidateRoutes);
 router.use('/parties', partyRoutes);
 router.use('/vote', voteRoutes);
 router.use('/tally', tallyRoutes);
+router.use('/keys', keyVerificationRoutes)
 
 // Error handling middleware
 router.use(errorHandler);
