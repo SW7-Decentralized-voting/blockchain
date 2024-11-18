@@ -102,6 +102,22 @@ describe('POST /api/v1/key/verify', () => {
 		expect(response.body).toEqual({ message: 'Invalid key' });
 	});
 
+	it('should return 401 Unauthorized with used key', async () => {
+		const pollingStation = await PollingStation.findOne();
+		const key = new Key({
+			keyHash: '123456',
+			pollingStation: pollingStation._id,
+		});
+		key.isUsed = true;
+		await key.save();
+
+		const response = await request(app)
+			.post(baseRoute + '/verify')
+			.send({ key: key.keyHash, pollingStation: key.pollingStation });
+		expect(response.statusCode).toBe(401);
+		expect(response.body).toEqual({ message: 'Invalid key' });
+	});
+
 	it('should return 500 Internal Server Error if an uncaught error happens', async () => {
 		jest.spyOn(PollingStation, 'findOne').mockImplementationOnce(() => {
 			throw new Error('Uncaught error');

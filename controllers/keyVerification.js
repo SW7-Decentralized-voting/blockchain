@@ -23,7 +23,7 @@ async function verifyKey(req, res) {
 
 		const keyDoc = await Key.findOne({ keyHash: key, pollingStation: pollingStation });
 
-		if (!keyDoc) {
+		if (!keyDoc || keyDoc.isUsed) {
 			return res.status(401).json({ message: 'Invalid key' });
 		}
 
