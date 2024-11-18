@@ -1,7 +1,7 @@
 import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
 import { Buffer } from 'buffer';
-import { privateDecrypt, publicEncrypt } from 'crypto';
+import * as paillierBigint from 'paillier-bigint';
 
 /**
  * Cast a vote in the election contract
@@ -22,25 +22,35 @@ async function vote(req, res, next) {
         return res.status(400).json({ error: 'Election is not in the voting phase' });
     }
 
-    const id  = req.body.id;
+    let id  = req.body.id;
 
     if (!id) {
         return res.status(400).json({ error: 'id is required' });
     }
 
-    const encryptionKey = await election.encryptionKey();
+    // Convert id = '0x0' to bigint
+    id = BigInt(id);
 
-    if (!encryptionKey) {
+    const encryptionKeyJson = await election.encryptionKey();
+
+    if (!encryptionKeyJson) {
         return res.status(400).json({ error: 'Encryption key is not set' });
     }
 
-    const encryptedVote = publicEncrypt(encryptionKey, Buffer.from(id));
+    const encryptionKeyObject = JSON.parse(encryptionKeyJson);
+
+    const publicKey = new paillierBigint.PublicKey(BigInt(encryptionKeyObject.n), BigInt(encryptionKeyObject.g));
+
+    const encryptedVote = publicKey.encrypt(id);
+
+    // Ensure that encryptedVote is bytes32 solidity type
+    const encryptedVoteBuffer = Buffer.from(encryptedVote.toString(16), 'hex');
 
     try {
-        const tx = await election.castVote(encryptedVote);
+        const tx = await election.castVote(encryptedVoteBuffer);
         await tx.wait();
 
-        res.json({
+        return res.json({
             message: 'Vote cast successfully',
             transactionHash: tx.hash
         });

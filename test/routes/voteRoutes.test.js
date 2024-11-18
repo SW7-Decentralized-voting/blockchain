@@ -3,6 +3,8 @@ import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
+import electionRouter from '../../routes/electionRoutes.js';
+import * as paillierBigint from 'paillier-bigint'
 
 let router;
 const baseRoute = '/vote';
@@ -10,6 +12,7 @@ const baseRoute = '/vote';
 const app = express();
 app.use(express.json());
 app.use(baseRoute, async (req, res, next) => (await router)(req, res, next));
+app.use('/election', electionRouter);
 
 const server = app.listen(0);
 
@@ -51,6 +54,34 @@ describe('POST /vote', () => {
             .send({ id: '0x1234567890abcdef' });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({error: 'Encryption key is not set'});
+    });
+
+    test('It should respond with 200 when the election is in the voting phase and an encryption key has been set', async () => {
+        const { publicKey, privateKey } = await paillierBigint.generateRandomKeys(3072);
+
+          const publicKeyString = JSON.stringify({
+            n: publicKey.n.toString(),
+            g: publicKey.g.toString()
+          });
+
+        const body = {
+            'candidates': [
+                { '_id': '0x0', 'name': 'Johan', 'party': 'democrats' }
+            ],
+            'parties': [
+                { '_id': '0x1', 'name': 'democrats' }
+            ],
+            'publicKey': publicKeyString
+        };
+
+        await request(app).post('/election/start').send(body);
+        await getElection().startVotingPhase();
+        
+        const response = await request(server)
+            .post(baseRoute)
+            .send({ id: '0x1234567890abcdef' });
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toEqual({ message: 'Vote cast successfully', transactionHash: expect.any(String) });
     });
 }
 );
