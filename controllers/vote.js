@@ -38,13 +38,16 @@ async function vote(req, res, next) {
     }
 
     const encryptionKeyObject = JSON.parse(encryptionKeyJson);
-
     const publicKey = new paillierBigint.PublicKey(BigInt(encryptionKeyObject.n), BigInt(encryptionKeyObject.g));
-
     const encryptedVote = publicKey.encrypt(id);
 
-    // Ensure that encryptedVote is bytes32 solidity type
+    //console.log('Encrypted vote:', encryptedVote);
+
+    // Ensure that encryptedVoted is bytes memory solidity type
     const encryptedVoteBuffer = Buffer.from(encryptedVote.toString(16), 'hex');
+
+    //console.log('Encrypted vote:', encryptedVote);
+    //console.log('Encrypted vote:', encryptedVoteBuffer);
 
     try {
         const tx = await election.castVote(encryptedVoteBuffer);

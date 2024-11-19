@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
-import { Buffer } from 'buffer';
+import * as paillierBigint from 'paillier-bigint'
 
 /**
  * Decrypts the votes and tallies them
@@ -12,12 +12,6 @@ import { Buffer } from 'buffer';
  * @returns {Response} Express response object with the tally of votes
  */
 async function decryptAndTallyVotes(req, res, next) {
-	const privateKey = req.body.privateKey;
-
-	if (!privateKey) {
-		return res.status(400).send({ error: 'Private key is required' });
-	}
-
 	try {
 		const election = getElection();
 		if (election === null) {
@@ -28,29 +22,51 @@ async function decryptAndTallyVotes(req, res, next) {
 			return res.status(400).json({ error: 'Election is not in the tallying phase' });
 		}
 
+		const privateKeyString = req.body.privateKey;
+
+		// Deserialize the private key string
+		const privateKeyObject = JSON.parse(privateKeyString);
+
+		// Convert string values back to BigInt
+		const lambda = BigInt(privateKeyObject.lambda);
+		const mu = BigInt(privateKeyObject.mu);
+		const publicKey = new paillierBigint.PublicKey(BigInt(privateKeyObject.publicKey.n), BigInt(privateKeyObject.publicKey.g));
+
+		// Reconstruct the PrivateKey object
+		const privateKey = new paillierBigint.PrivateKey(lambda, mu, publicKey);
+
+		if (!privateKey) {
+			return res.status(400).send({ error: 'Private key is required' });
+		}
+
 		const votes = await election.getEncryptedVotes();
 
-		console.log('Votes:', votes);
+		if (!votes) {
+			return res.status(200).json({});
+		}
 
 		const decryptedVotes = votes.map(vote => {
 			try {
-				const buffer = Buffer.from(vote, 'base64');
-				console.log(buffer)
-				const decrypted = crypto.privateDecrypt(privateKey, buffer);
-				return decrypted.toString('utf8');
+				return privateKey.decrypt(BigInt(vote));
+				
 			} catch (error) {
 				console.error(error);
 				return null;
 			}
 
 		});
-
+		
 		const tally = decryptedVotes.reduce((acc, vote) => {
 			acc[vote] = acc[vote] ? acc[vote] + 1 : 1;
 			return acc;
 		}, {});
 
+		console.log('Tally:', tally);
+
 		res.status(200).json(tally);
+		
+
+		
 	} catch (error) {
 		next(error);
 	}
