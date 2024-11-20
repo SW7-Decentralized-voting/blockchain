@@ -61,7 +61,7 @@ async function decryptAndTallyVotes(req, res, next) {
 			return acc;
 		}, {});
 
-		console.log('Tally:', tally);
+		// console.log('Tally:', tally);
 
 		res.status(200).json(tally);
 		

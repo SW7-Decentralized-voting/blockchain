@@ -172,7 +172,7 @@ describe('GET /tally', () => {
 
         const body = {
             'candidates': [
-                { '_id': '0x0', 'name': 'Johan', 'party': 'democrats' }
+                { '_id': '0x0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' }
             ],
             'parties': [
                 { '_id': '0x1','name': 'democrats' }
