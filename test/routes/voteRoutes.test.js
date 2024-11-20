@@ -3,6 +3,7 @@ import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
+import { jest } from '@jest/globals';
 
 let router;
 const baseRoute = '/vote';
@@ -15,6 +16,12 @@ const server = app.listen(0);
 
 beforeAll(async () => {
     router = (await import('../../routes/voteRoutes.js')).default;
+});
+
+jest.unstable_mockModule('../../middleware/auth.js', () => {
+	return {
+		auth: jest.fn((req, res, next) => next()),
+	};
 });
 
 beforeEach(async () => {

@@ -2,22 +2,27 @@ import express from 'express';
 import auth from '../../middleware/auth';
 import jwt from 'jsonwebtoken';
 import { beforeAll, jest } from '@jest/globals';
+import keys from '../../config/keys';
 
 const app = express();
 app.use(express.json());
 
 beforeAll(() => {
+	jest.restoreAllMocks();
 	jest.unstable_mockModule('jsonwebtoken', () => {
 		return {
 			verify: jest.fn(),
 		};
 	});
+
+	
 });
 
 describe('auth', () => {
 	let req, res, next;
 
 	beforeEach(() => {
+		jest.restoreAllMocks();
 		req = {
 			headers: {}
 		};
@@ -36,7 +41,7 @@ describe('auth', () => {
 	});
 
 	it('should return 401 if token is invalid', () => {
-		req.headers['Authorization'] = 'invalidToken';
+		req.headers['authorization'] = 'invalidToken';
 		jest.spyOn(jwt, 'verify').mockImplementation(() => { throw new Error(); });
 
 		auth(req, res, next);
@@ -47,12 +52,12 @@ describe('auth', () => {
 
 	it('should call next if token is valid', () => {
 		const decodedToken = { id: 'userId' };
-		req.headers['Authorization'] = 'validToken';
+		req.headers['authorization'] = 'validToken';
 		jest.spyOn(jwt, 'verify').mockReturnValue(decodedToken);
 
 		auth(req, res, next);
 
-		expect(jwt.verify).toHaveBeenCalledWith('validToken', process.env.JWT_KEY);
+		expect(jwt.verify).toHaveBeenCalledWith('validToken', keys.jwtSecret);
 		expect(req.user).toEqual(decodedToken);
 		expect(next).toHaveBeenCalled();
 	});
