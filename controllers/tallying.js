@@ -25,13 +25,8 @@ async function decryptAndTallyVotes(req, res) {
 		// Deserialize the private key string
 		const privateKeyObject = JSON.parse(privateKeyString);
 
-		// Convert string values back to BigInt
-		const lambda = BigInt(privateKeyObject.lambda);
-		const mu = BigInt(privateKeyObject.mu);
 		const publicKey = new paillierBigint.PublicKey(BigInt(privateKeyObject.publicKey.n), BigInt(privateKeyObject.publicKey.g));
-
-		// Reconstruct the PrivateKey object
-		const privateKey = new paillierBigint.PrivateKey(lambda, mu, publicKey);
+		const privateKey = new paillierBigint.PrivateKey(BigInt(privateKeyObject.lambda), BigInt(privateKeyObject.mu), publicKey);
 
 		if (!privateKey) {
 			return res.status(400).send({ error: 'Private key is required' });
@@ -46,7 +41,7 @@ async function decryptAndTallyVotes(req, res) {
 		const decryptedVotes = votes.map(vote => {
 			try {
 				return privateKey.decrypt(BigInt(vote));
-				
+
 			} catch (error) {
 				// eslint-disable-next-line no-console
 				console.error(error);
@@ -54,7 +49,7 @@ async function decryptAndTallyVotes(req, res) {
 			}
 
 		});
-		
+
 		const tally = decryptedVotes.reduce((acc, vote) => {
 			acc[vote] = acc[vote] ? acc[vote] + 1 : 1;
 			return acc;
@@ -63,9 +58,9 @@ async function decryptAndTallyVotes(req, res) {
 		// console.log('Tally:', tally);
 
 		res.status(200).json(tally);
-		
 
-		
+
+
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error(error);

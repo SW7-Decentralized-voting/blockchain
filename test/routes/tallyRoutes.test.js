@@ -137,10 +137,10 @@ describe('GET /tally', () => {
             lambda: privateKey.lambda.toString(),
             mu: privateKey.mu.toString(),
             publicKey: {
-              n: privateKey.publicKey.n.toString(),
-              g: privateKey.publicKey.g.toString()
+                n: privateKey.publicKey.n.toString(),
+                g: privateKey.publicKey.g.toString()
             }
-          });
+        });
 
         await startContract();
         await getElection().startVotingPhase();
@@ -160,22 +160,22 @@ describe('GET /tally', () => {
             lambda: privateKey.lambda.toString(),
             mu: privateKey.mu.toString(),
             publicKey: {
-              n: privateKey.publicKey.n.toString(),
-              g: privateKey.publicKey.g.toString()
+                n: privateKey.publicKey.n.toString(),
+                g: privateKey.publicKey.g.toString()
             }
-          });
+        });
 
-          const publicKeyString = JSON.stringify({
+        const publicKeyString = JSON.stringify({
             n: publicKey.n.toString(),
             g: publicKey.g.toString()
-          });
+        });
 
         const body = {
             'candidates': [
                 { '_id': '0x0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' }
             ],
             'parties': [
-                { '_id': '0x1','name': 'democrats' }
+                { '_id': '0x1', 'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
