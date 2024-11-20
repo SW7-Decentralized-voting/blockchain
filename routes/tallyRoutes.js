@@ -30,7 +30,7 @@ router.post('/upload-key', async (req, res, next) => {
 }
 );
 
-router.get('/encrypted-votes', async (req, res, next) => {
+router.get('/encrypted-votes', async (req, res) => {
     const election = getElection();
     if (election === null) {
         return res.status(400).json({ error: 'Election has not started' });
@@ -44,6 +44,8 @@ router.get('/encrypted-votes', async (req, res, next) => {
         const result = await election.getEncryptedVotes();
         res.json(result);
     } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
         return res.status(500).json({ error: 'Error getting encrypted votes' });
     }
 }

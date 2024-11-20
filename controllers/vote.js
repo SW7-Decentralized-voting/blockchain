@@ -7,10 +7,9 @@ import * as paillierBigint from 'paillier-bigint';
  * Cast a vote in the election contract
  * @param {Request} req Express request object. Should contain the id of the candidate or party to vote for (or blank id)
  * @param {Response} res Express response object
- * @param {NextFunction} next Express next function (error handler)
  * @returns {Promise<Response>} Express response object with a success message or an error message
  */
-async function vote(req, res, next) {
+async function vote(req, res) {
     const election = getElection();
 
     if (election === null) {
@@ -53,6 +52,7 @@ async function vote(req, res, next) {
             transactionHash: tx.hash
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
         return res.status(500).json({ error: 'Error casting vote' });
     }

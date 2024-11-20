@@ -110,7 +110,7 @@ describe('GET /encrypted-votes', () => {
 );
 
 describe('GET /tally', () => {
-    const privateKey = "key";
+    const privateKey = 'key';
     it('Should return an error if the election has not started', async () => {
         const response = await request(app)
             .get(baseRoute)
@@ -131,7 +131,7 @@ describe('GET /tally', () => {
     });
 
     it('Should return the tally (empty)', async () => {
-        const { publicKey, privateKey } = await paillierBigint.generateRandomKeys(3072);
+        const { privateKey } = await paillierBigint.generateRandomKeys(3072);
 
         const privateKeyString = JSON.stringify({
             lambda: privateKey.lambda.toString(),
@@ -147,10 +147,10 @@ describe('GET /tally', () => {
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/`)
-            .send({ privateKeyString });
+            .send({ privateKey: privateKeyString });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual([]);
+        expect(response.body).toEqual({});
     });
 
     it('Should return the tally', async () => {

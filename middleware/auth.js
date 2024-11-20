@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import keys from '../config/keys';
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ const auth = (req, res, next) => {
 	}
 
 	try {
-		const verified = jwt.verify(token, process.env.JWT_SECRET);
+		const verified = jwt.verify(token, keys.jwtSecret);
 		req.user = verified;
 		next();
 	} catch {

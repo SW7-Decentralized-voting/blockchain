@@ -4,7 +4,7 @@ import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
 import electionRouter from '../../routes/electionRoutes.js';
-import * as paillierBigint from 'paillier-bigint'
+import * as paillierBigint from 'paillier-bigint';
 
 let router;
 const baseRoute = '/vote';
@@ -57,7 +57,7 @@ describe('POST /vote', () => {
     });
 
     test('It should respond with 200 when the election is in the voting phase and an encryption key has been set', async () => {
-        const { publicKey, privateKey } = await paillierBigint.generateRandomKeys(3072);
+        const { publicKey } = await paillierBigint.generateRandomKeys(3072);
 
           const publicKeyString = JSON.stringify({
             n: publicKey.n.toString(),

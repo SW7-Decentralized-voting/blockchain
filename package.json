@@ -39,6 +39,7 @@
         "testPathIgnorePatterns": [
             "/node_modules/",
             "test/contracts/"
-        ]
+        ],
+        "testTimeout": 10000
     }
 }

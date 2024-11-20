@@ -1,17 +1,15 @@
-import crypto from 'crypto';
 import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
-import * as paillierBigint from 'paillier-bigint'
+import * as paillierBigint from 'paillier-bigint';
 
 /**
  * Decrypts the votes and tallies them
  * @param {Request} req Express request object. Should contain the private key to 
  * decrypt the votes in the body
  * @param {Response} res Express response object
- * @param {NextFunction} next Express next function (error handler)
  * @returns {Response} Express response object with the tally of votes
  */
-async function decryptAndTallyVotes(req, res, next) {
+async function decryptAndTallyVotes(req, res) {
 	try {
 		const election = getElection();
 		if (election === null) {
@@ -50,6 +48,7 @@ async function decryptAndTallyVotes(req, res, next) {
 				return privateKey.decrypt(BigInt(vote));
 				
 			} catch (error) {
+				// eslint-disable-next-line no-console
 				console.error(error);
 				return null;
 			}
@@ -68,7 +67,9 @@ async function decryptAndTallyVotes(req, res, next) {
 
 		
 	} catch (error) {
-		next(error);
+		// eslint-disable-next-line no-console
+		console.error(error);
+		return res.status(500).json({ error: 'Error tallying votes' });
 	}
 }
 
