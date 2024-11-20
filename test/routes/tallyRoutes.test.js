@@ -3,23 +3,30 @@ import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
-import voteRouter from '../../routes/voteRoutes.js';
 import electionRouter from '../../routes/electionRoutes.js';
 import * as paillierBigint from 'paillier-bigint';
+import { jest } from '@jest/globals';
 
-let router;
+let router, voteRouter;
 const baseRoute = '/tally';
 
 const app = express();
 app.use(express.json());
 app.use(baseRoute, async (req, res, next) => (await router)(req, res, next));
 app.use('/election', electionRouter);
-app.use('/vote', voteRouter);
+app.use('/vote', async (req, res, next) => (await voteRouter)(req, res, next));
 
 const server = app.listen(0);
 
+jest.unstable_mockModule('../../middleware/auth.js', () => {
+    return {
+        default: jest.fn((req, res, next) => next()),
+    };
+});
+
 beforeAll(async () => {
     router = (await import('../../routes/tallyRoutes.js')).default;
+    voteRouter = (await import('../../routes/voteRoutes.js')).default;
 });
 
 beforeEach(async () => {
