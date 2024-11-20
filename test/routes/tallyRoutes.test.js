@@ -29,7 +29,7 @@ beforeEach(async () => {
 afterAll(() => {
     server.close();
 });
-/*
+
 describe('POST /upload-key', () => {
     it('Should return an error if the election has not started', async () => {
         const response = await request(app)
@@ -108,7 +108,7 @@ describe('GET /encrypted-votes', () => {
     });
 }
 );
-*/
+
 describe('GET /tally', () => {
     const privateKey = "key";
     it('Should return an error if the election has not started', async () => {
