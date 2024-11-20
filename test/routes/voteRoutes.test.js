@@ -5,6 +5,7 @@ import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
 import electionRouter from '../../routes/electionRoutes.js';
 import * as paillierBigint from 'paillier-bigint';
+import { jest } from '@jest/globals';
 
 let router;
 const baseRoute = '/vote';
@@ -18,6 +19,12 @@ const server = app.listen(0);
 
 beforeAll(async () => {
     router = (await import('../../routes/voteRoutes.js')).default;
+});
+
+jest.unstable_mockModule('../../middleware/auth.js', () => {
+	return {
+		default: jest.fn((req, res, next) => next()),
+	};
 });
 
 beforeEach(async () => {

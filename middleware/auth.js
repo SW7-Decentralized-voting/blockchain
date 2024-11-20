@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import keys from '../config/keys';
+import keys from '../config/keys.js';
 
 dotenv.config();
 
 const auth = (req, res, next) => {
-	const token = req.headers['Authorization'];
+	const token = req.headers['authorization'];
 
 	if (!token) {
 		return res.status(401).json({
