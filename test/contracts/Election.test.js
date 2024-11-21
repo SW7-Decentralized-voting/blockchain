@@ -127,7 +127,6 @@ describe('Election Contract', function () {
         voteVectors = voteVectors.map(voteVector => {
             return voteVector.map(vote => vote.toString());
         });
-        console.log('Vote vectors: ', voteVectors);
         expect(voteVectors[0]).to.deep.equal(['0', '1']);
         expect(voteVectors[1]).to.deep.equal(['1', '0']);
     }

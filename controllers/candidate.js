@@ -26,7 +26,6 @@ async function getCandidates(req, res, next) {
 
 /**
  * Publish a candidate to the blockchain
- * @param {String} objectId mongoose object id of the candidate
  * @param {String} name The name of the candidate
  * @param {String} party name of andidate's party
  * @returns {String} Transaction hash
