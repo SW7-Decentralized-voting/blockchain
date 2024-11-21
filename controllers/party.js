@@ -26,11 +26,10 @@ async function getParties(req, res, next) {
 
 /**
  * Publish a party to the blockchain
- * @param {String} objectId mongoose object id of the party
  * @param {String} name The name of the party
  * @returns {String} Transaction hash
  */
-async function publishParty(objectId, name) {
+async function publishParty(name) {
     const election = getElection();
     if (election === null) {
         throw new Error('Election has not started');
@@ -46,7 +45,7 @@ async function publishParty(objectId, name) {
             throw new Error('Parties can only be added during the registration phase');
         }
 
-        const tx = await election.addParty(objectId, name);
+        const tx = await election.addParty(name);
         await tx.wait();
 
         return tx.hash;

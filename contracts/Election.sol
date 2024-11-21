@@ -7,20 +7,13 @@ contract Election {
 
     struct Candidate {
         uint id;
-        string objectId;
         string name;
         string party;
     }
 
     struct Party {
         uint id;
-        string objectId;
         string name;
-    }
-
-    struct VotingKey {
-        bool isValid;
-        bool isUsed;
     }
 
     mapping(uint => Candidate) public candidates;    // To store candidates
@@ -28,6 +21,7 @@ contract Election {
     
     uint public totalCandidates;
     uint public totalParties;
+    uint private uniqueIdCounter;
     
     
     address public electionOwner;
@@ -54,9 +48,10 @@ contract Election {
         _;
     }
 
-    function addCandidate(string memory _objectId, string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
-        candidates[totalCandidates] = Candidate(totalCandidates, _objectId, _name, _party);
+    function addCandidate(string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
+        candidates[totalCandidates] = Candidate(uniqueIdCounter, _name, _party);
         totalCandidates++;
+        uniqueIdCounter++;
     }
 
     function getCandidates() public view returns (Candidate[] memory) {
@@ -67,9 +62,10 @@ contract Election {
         return candidateList;
     }
 
-    function addParty(string memory _objectId, string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
-        parties[totalParties] = Party(totalParties, _objectId, _name);
+    function addParty(string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
+        parties[totalParties] = Party(uniqueIdCounter, _name);
         totalParties++;
+        uniqueIdCounter++;
     }
 
     function startVotingPhase() public onlyOwner inPhase(ElectionPhase.Registration) {
