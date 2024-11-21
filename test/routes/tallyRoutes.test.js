@@ -123,7 +123,7 @@ describe('GET /encrypted-votes', () => {
             'publicKey': publicKeyString
         };
 
-        const voteVector = [1, 0, 0];
+        const voteVector = [1, 0, 0, 0];
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
         await request(app).post('/vote').send({ voteVector });
@@ -134,7 +134,7 @@ describe('GET /encrypted-votes', () => {
         expect(response.statusCode).toBe(200);
         // expect array of arrays of strings
         expect(response.body).toEqual([
-            [expect.any(String), expect.any(String), expect.any(String)]
+            [expect.any(String), expect.any(String), expect.any(String), expect.any(String)]
         ]);
     });
 }
@@ -212,9 +212,9 @@ describe('GET /tally', () => {
             ],
             'publicKey': publicKeyString
         };
-        const v1 = [1, 0, 0];
-        const v2 = [0, 1, 0];
-        const v3 = [1, 0, 0];
+        const v1 = [1, 0, 0, 0];
+        const v2 = [0, 1, 0, 0];
+        const v3 = [1, 0, 0, 0];
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
         await request(app).post('/vote').send({ voteVector: v1 });
@@ -226,6 +226,6 @@ describe('GET /tally', () => {
             .send({ privateKey: privateKeyString });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual({ tally: ['2', '1', '0'] });
+        expect(response.body).toEqual({ tally: ['2', '1', '0', '0'] });
     });
 });

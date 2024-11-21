@@ -117,11 +117,19 @@ describe('Election Contract', function () {
     );
 
     it('Should allow voting', async function () {
+        await election.addCandidate('Alice', 'PartyA');
+        await election.addCandidate('Bob', 'PartyB');
         await election.startVotingPhase();
-        await election.castVote([['0x1234567890abcdef'], ['0xabcdef1234567890']]);
-        const voteVectors = await election.getEncryptedVoteVectors();
-        expect(voteVectors[0]).to.equal('0x1234567890abcdef');
-        expect(voteVectors[1]).to.equal('0xabcdef1234567890');
+        await election.castVote(['0', '1']);
+        await election.castVote(['1', '0']);
+        let voteVectors = await election.getEncryptedVoteVectors();
+        // parse to an array of arrays of strings
+        voteVectors = voteVectors.map(voteVector => {
+            return voteVector.map(vote => vote.toString());
+        });
+        console.log('Vote vectors: ', voteVectors);
+        expect(voteVectors[0]).to.deep.equal(['0', '1']);
+        expect(voteVectors[1]).to.deep.equal(['1', '0']);
     }
     );
 

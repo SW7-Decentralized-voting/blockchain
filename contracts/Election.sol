@@ -74,7 +74,7 @@ contract Election {
 
     function castVote(string[] memory _encryptedVoteVector) public onlyOwner inPhase(ElectionPhase.Voting) {
     // Check that the vote vector is the correct length
-    require(_encryptedVoteVector.length == uniqueIdCounter-1, "Invalid vote vector length.");
+    require(_encryptedVoteVector.length == uniqueIdCounter, "Invalid vote vector length.");
     encryptedVoteVectors.push(_encryptedVoteVector);
     emit VoteCast(_encryptedVoteVector);
     }
@@ -110,5 +110,9 @@ contract Election {
 
     function getEncryptedVoteVectors() public view returns (string[][] memory) {
         return encryptedVoteVectors;
+    }
+
+    function getUniqueIdCounter() public view returns (uint) {
+        return uniqueIdCounter;
     }
 }

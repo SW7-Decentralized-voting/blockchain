@@ -89,7 +89,7 @@ describe('POST /vote', () => {
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
 
-        const voteVector = [1, 0, 0];
+        const voteVector = [1, 0, 0, 0];
         
         const response = await request(server)
             .post(baseRoute)
