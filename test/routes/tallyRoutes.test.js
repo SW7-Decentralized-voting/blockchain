@@ -179,16 +179,19 @@ describe('GET /tally', () => {
 
         const body = {
             'candidates': [
-                { '_id': '0x0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' }
+                {'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
+                {'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                { '_id': '0x1', 'name': 'democrats' }
+                {'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
+        const voteVector = [1, 0, 0];
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
-        await request(app).post('/vote').send({ id: '0x0' });
+        await request(app).post('/vote').send({ voteVector });
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/`)
@@ -196,7 +199,9 @@ describe('GET /tally', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({
-            '0': 1
+            '0': 1,
+            '1': 0,
+            '2': 0
         });
     });
 });

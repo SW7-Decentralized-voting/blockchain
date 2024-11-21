@@ -37,18 +37,20 @@ afterAll(() => {
 
 describe('POST /vote', () => {
     test('It should respond with the error code 400 when no contract is deployed', async () => {
+        const voteVector = [1];
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteVector });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election has not started' });
     });
 
     test('It should respond with 400 when the election is not in the voting phase', async () => {
         await startContract();
+        const voteVector = [1];
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteVector });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election is not in the voting phase' });
     });
@@ -56,9 +58,10 @@ describe('POST /vote', () => {
     test('It should respond with 400 when the election is in the voting phase but no encryption key has been set', async () => {
         await startContract();
         await getElection().startVotingPhase();
+        const voteVector = [1];
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteVector });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({error: 'Encryption key is not set'});
     });
@@ -73,20 +76,24 @@ describe('POST /vote', () => {
 
         const body = {
             'candidates': [
-                { '_id': '0x0', 'name': 'Johan', 'party': 'democrats' }
+                {'name': 'Dwayne The Rock Johnson', 'party': 'democrats' },
+                {'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                { '_id': '0x1', 'name': 'democrats' }
+                {'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
 
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
+
+        const voteVector = [1, 0, 0];
         
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteVector });
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ message: 'Vote cast successfully', transactionHash: expect.any(String) });
     });

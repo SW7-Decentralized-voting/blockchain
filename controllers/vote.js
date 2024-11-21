@@ -1,6 +1,5 @@
 import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
-import { Buffer } from 'buffer';
 import * as paillierBigint from 'paillier-bigint';
 
 /**
@@ -21,30 +20,38 @@ async function vote(req, res) {
         return res.status(400).json({ error: 'Election is not in the voting phase' });
     }
 
-    let id  = req.body.id;
+    let voteVector  = req.body.voteVector;
 
-    if (!id) {
-        return res.status(400).json({ error: 'id is required' });
+    if (!Array.isArray(voteVector)) {
+        return res.status(400).json({ error: 'voteVector must be an array' });
     }
 
-    // Convert id = '0x0' to bigint
-    id = BigInt(id);
+    try {
+        voteVector = voteVector.map(vote => BigInt(vote));
+    } catch (error) {
+        return res.status(400).json({ error: 'Invalid vote values in vector:' + error.message });
+    }
 
     const encryptionKeyJson = await election.encryptionKey();
-
     if (!encryptionKeyJson) {
         return res.status(400).json({ error: 'Encryption key is not set' });
     }
 
     const encryptionKeyObject = JSON.parse(encryptionKeyJson);
     const publicKey = new paillierBigint.PublicKey(BigInt(encryptionKeyObject.n), BigInt(encryptionKeyObject.g));
-    const encryptedVote = publicKey.encrypt(id);
 
-    // Ensure that encryptedVoted is bytes memory solidity type
-    const encryptedVoteBuffer = Buffer.from(encryptedVote.toString(16), 'hex');
+    // console.log('Vote vector: ', voteVector);
+    
+    const encryptedVoteVector = voteVector.map(vote => publicKey.encrypt(BigInt(vote)));
+
+    //console.log('Encrypted vote vector: ', encryptedVoteVector);
+
+    const encryptedVoteVectorString = encryptedVoteVector.map(vote => vote.toString());
+
+    // console.log('Encrypted vote vector string: ', encryptedVoteVectorString);
 
     try {
-        const tx = await election.castVote(encryptedVoteBuffer);
+        const tx = await election.castVote(encryptedVoteVectorString);
         await tx.wait();
 
         return res.json({

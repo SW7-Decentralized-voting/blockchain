@@ -23,15 +23,14 @@ contract Election {
     uint public totalParties;
     uint private uniqueIdCounter;
     
-    
     address public electionOwner;
     string public encryptionKey;
     string public decryptionKey;
 
-    event VoteCast(bytes encryptedVote);
+    event VoteCast(string[] _encryptedVoteVector);
     event PhaseChanged(ElectionPhase newPhase);
 
-    bytes[] public encryptedVotes;
+    string[][] public encryptedVoteVectors;
 
     constructor() {
         electionOwner = msg.sender;
@@ -73,9 +72,11 @@ contract Election {
         emit PhaseChanged(ElectionPhase.Voting);
     }
 
-    function castVote(bytes memory _encryptedVote) public onlyOwner inPhase(ElectionPhase.Voting) {
-    encryptedVotes.push(_encryptedVote);
-    emit VoteCast(_encryptedVote);
+    function castVote(string[] memory _encryptedVoteVector) public onlyOwner inPhase(ElectionPhase.Voting) {
+    // Check that the vote vector is the correct length
+    require(_encryptedVoteVector.length == uniqueIdCounter-1, "Invalid vote vector length.");
+    encryptedVoteVectors.push(_encryptedVoteVector);
+    emit VoteCast(_encryptedVoteVector);
     }
 
     function startTallyingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
@@ -107,7 +108,7 @@ contract Election {
         return partyList;
     }
 
-    function getEncryptedVotes() public view returns (bytes[] memory) {
-        return encryptedVotes;
+    function getEncryptedVotes() public view returns (string[][] memory) {
+        return encryptedVoteVectors;
     }
 }

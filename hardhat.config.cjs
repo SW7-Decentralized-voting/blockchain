@@ -1,4 +1,5 @@
 require('@nomicfoundation/hardhat-toolbox');
+require('@nomicfoundation/hardhat-ethers');
 
 // eslint-disable-next-line jsdoc/valid-types
 /** @type import('hardhat/config').HardhatUserConfig */
