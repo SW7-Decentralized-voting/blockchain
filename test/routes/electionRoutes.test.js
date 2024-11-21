@@ -53,7 +53,7 @@ describe('Election Routes', () => {
             await startContract();
             const body = {
                 'candidates': [
-                    { '_id': '0x0','name': 'Johan', 'party': 'democrats' }
+                    {'name': 'Johan', 'party': 'democrats' }
                 ],
                 'parties': [
                     {'name': 'democrats' }

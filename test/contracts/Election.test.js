@@ -118,9 +118,10 @@ describe('Election Contract', function () {
 
     it('Should allow voting', async function () {
         await election.startVotingPhase();
-        await election.castVote('0x1234567890abcdef');
-        const vote = await election.getEncryptedVotes();
-        expect(vote[0]).to.equal('0x1234567890abcdef');
+        await election.castVote([['0x1234567890abcdef'], ['0xabcdef1234567890']]);
+        const voteVectors = await election.getEncryptedVoteVectors();
+        expect(voteVectors[0]).to.equal('0x1234567890abcdef');
+        expect(voteVectors[1]).to.equal('0xabcdef1234567890');
     }
     );
 

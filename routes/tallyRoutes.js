@@ -41,7 +41,7 @@ router.get('/encrypted-votes', async (req, res) => {
     }
 
     try {
-        const result = await election.getEncryptedVotes();
+        const result = await election.getEncryptedVoteVectors();
         res.json(result);
     } catch (error) {
         // eslint-disable-next-line no-console

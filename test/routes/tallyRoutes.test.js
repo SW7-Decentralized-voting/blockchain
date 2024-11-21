@@ -5,7 +5,7 @@ import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
 import electionRouter from '../../routes/electionRoutes.js';
 import * as paillierBigint from 'paillier-bigint';
-import { jest } from '@jest/globals';
+import { expect, jest } from '@jest/globals';
 
 let router, voteRouter;
 const baseRoute = '/tally';
@@ -104,14 +104,38 @@ describe('GET /encrypted-votes', () => {
     });
 
     it('Should return the encrypted votes', async () => {
-        await startContract();
+        const { publicKey, _privateKey } = await paillierBigint.generateRandomKeys(3072);
+
+        const publicKeyString = JSON.stringify({
+            n: publicKey.n.toString(),
+            g: publicKey.g.toString()
+        });
+
+        const body = {
+            'candidates': [
+                {'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
+                {'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'name': 'Tom Hanks', 'party': 'democrats' }
+            ],
+            'parties': [
+                {'name': 'democrats' }
+            ],
+            'publicKey': publicKeyString
+        };
+
+        const voteVector = [1, 0, 0];
+        await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
+        await request(app).post('/vote').send({ voteVector });
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/encrypted-votes`);
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual([]);
+        // expect array of arrays of strings
+        expect(response.body).toEqual([
+            [expect.any(String), expect.any(String), expect.any(String)]
+        ]);
     });
 }
 );
@@ -188,20 +212,20 @@ describe('GET /tally', () => {
             ],
             'publicKey': publicKeyString
         };
-        const voteVector = [1, 0, 0];
+        const v1 = [1, 0, 0];
+        const v2 = [0, 1, 0];
+        const v3 = [1, 0, 0];
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
-        await request(app).post('/vote').send({ voteVector });
+        await request(app).post('/vote').send({ voteVector: v1 });
+        await request(app).post('/vote').send({ voteVector: v2 });
+        await request(app).post('/vote').send({ voteVector: v3 });
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/`)
             .send({ privateKey: privateKeyString });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual({
-            '0': 1,
-            '1': 0,
-            '2': 0
-        });
+        expect(response.body).toEqual({ tally: ['2', '1', '0'] });
     });
 });

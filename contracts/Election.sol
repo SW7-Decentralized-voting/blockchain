@@ -108,7 +108,7 @@ contract Election {
         return partyList;
     }
 
-    function getEncryptedVotes() public view returns (string[][] memory) {
+    function getEncryptedVoteVectors() public view returns (string[][] memory) {
         return encryptedVoteVectors;
     }
 }
