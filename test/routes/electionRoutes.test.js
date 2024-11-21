@@ -37,7 +37,7 @@ describe('Election Routes', () => {
         test('It should respond with 200 when no election contract is deployed with candidates and parties', async () => {
             const body = {
                 'candidates': [
-                    { 'name': 'Johan', 'party': 'democrats' }
+                    { 'name': 'Brent Peterson', 'party': 'democrats' }
                 ],
                 'parties': [
                     {'name': 'democrats' }
@@ -53,7 +53,7 @@ describe('Election Routes', () => {
             await startContract();
             const body = {
                 'candidates': [
-                    {'name': 'Johan', 'party': 'democrats' }
+                    {'name': 'Brent Peterson', 'party': 'democrats' }
                 ],
                 'parties': [
                     {'name': 'democrats' }
@@ -75,7 +75,7 @@ describe('Election Routes', () => {
         test('It should respond with 200 when an election contract is deployed and in registration phase', async () => {
             const body = {
                 'candidates': [
-                    {'name': 'Johan', 'party': 'democrats' }
+                    {'name': 'Brent Peterson', 'party': 'democrats' }
                 ],
                 'parties': [
                     { 'name': 'democrats' }
@@ -90,7 +90,7 @@ describe('Election Routes', () => {
         test('It should respond with 200 when an election contract is deployed and in voting phase', async () => {
             const body = {
                 'candidates': [
-                    {'name': 'Johan', 'party': 'democrats' }
+                    {'name': 'Brent Peterson', 'party': 'democrats' }
                 ],
                 'parties': [
                     { 'name': 'democrats' }
@@ -106,7 +106,7 @@ describe('Election Routes', () => {
         test('It should respond with 400 when an election contract is deployed and in tallying phase', async () => {
             const body = {
                 'candidates': [
-                    {'name': 'Johan', 'party': 'democrats' }
+                    {'name': 'Brent Peterson', 'party': 'democrats' }
                 ],
                 'parties': [
                     { 'name': 'democrats' }
