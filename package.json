@@ -36,6 +36,7 @@
         "ethers": "^6.13.3",
         "express": "^4.21.1",
         "jsonwebtoken": "^9.0.2",
+        "paillier-bigint": "^3.4.3",
         "mongoose": "^8.8.1"
     },
     "jest": {
@@ -43,6 +44,7 @@
             "/node_modules/",
             "test/contracts/"
         ],
+        "testTimeout": 10000,
         "globalSetup": "<rootDir>/test/setup/jest-setup.js",
         "globalTeardown": "<rootDir>/test/setup/jest-teardown.js",
         "testEnvironment": "<rootDir>/test/setup/jest-mongo.js"
