@@ -53,9 +53,7 @@ async function vote(req, res) {
             transactionHash: tx.hash
         });
     } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-        return res.status(500).json({ error: 'Error casting vote' });
+        return res.status(500).json({ error: 'Error casting vote: ' + error.message });
     }
 }
 
