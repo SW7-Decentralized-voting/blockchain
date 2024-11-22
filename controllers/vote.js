@@ -20,7 +20,7 @@ async function vote(req, res) {
         return res.status(400).json({ error: 'Election is not in the voting phase' });
     }
 
-    let voteVector  = req.body.voteVector;
+    let voteVector = req.body.voteVector;
 
     if (!Array.isArray(voteVector)) {
         return res.status(400).json({ error: 'voteVector must be an array' });
@@ -37,20 +37,14 @@ async function vote(req, res) {
         return res.status(400).json({ error: 'Encryption key is not set' });
     }
 
-    const encryptionKeyObject = JSON.parse(encryptionKeyJson);
-    const publicKey = new paillierBigint.PublicKey(BigInt(encryptionKeyObject.n), BigInt(encryptionKeyObject.g));
-
-    // console.log('Vote vector: ', voteVector);
-    
-    const encryptedVoteVector = voteVector.map(vote => publicKey.encrypt(BigInt(vote)));
-
-    //console.log('Encrypted vote vector: ', encryptedVoteVector);
-
-    const encryptedVoteVectorString = encryptedVoteVector.map(vote => vote.toString());
-
-    // console.log('Encrypted vote vector string: ', encryptedVoteVectorString);
-
     try {
+        const encryptionKeyObject = JSON.parse(encryptionKeyJson);
+        const publicKey = new paillierBigint.PublicKey(BigInt(encryptionKeyObject.n), BigInt(encryptionKeyObject.g));
+
+        const encryptedVoteVector = voteVector.map(vote => publicKey.encrypt(BigInt(vote)));
+
+        const encryptedVoteVectorString = encryptedVoteVector.map(vote => vote.toString());
+
         const tx = await election.castVote(encryptedVoteVectorString);
         await tx.wait();
 
