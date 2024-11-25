@@ -25,21 +25,21 @@ describe('Election Contract', function () {
 
     it('Should not allow non-owners to add a candidate', async function () {
         await expect(
-            election.connect(_addr1).addCandidate('Alice', 'PartyA')
+            election.connect(_addr1).addCandidate(0, 'Alice', 'PartyA')
         ).to.be.revertedWith('Only the election owner can perform this action.');
     }
     );
 
     it('Should add a candidate', async function () {
-        await election.addCandidate('Alice', 'PartyA');
+        await election.addCandidate(0, 'Alice', 'PartyA');
         const candidate = await election.candidates(0);
         expect(candidate.name).to.equal('Alice');
         expect(candidate.party).to.equal('PartyA');
     });
 
     it('Should get the list of candidates', async function () {
-        await election.addCandidate('Alice', 'PartyA');
-        await election.addCandidate('Bob', 'PartyB');
+        await election.addCandidate(0, 'Alice', 'PartyA');
+        await election.addCandidate(1, 'Bob', 'PartyB');
         const candidates = await election.getCandidates();
         expect(candidates[0].id).to.equal(0);
         expect(candidates[0].name).to.equal('Alice');
@@ -49,32 +49,19 @@ describe('Election Contract', function () {
     });
 
     it('Should add a party', async function () {
-        await election.addParty('PartyA');
+        await election.addParty(0, 'PartyA');
         const party = await election.parties(0);
         expect(party.name).to.equal('PartyA');
     });
 
     it('Should get the list of parties', async function () {
-        await election.addParty('PartyA');
-        await election.addParty('PartyB');
+        await election.addParty(0, 'PartyA');
+        await election.addParty(1, 'PartyB');
         const parties = await election.getParties();
         expect(parties[0].id).to.equal(0);
         expect(parties[0].name).to.equal('PartyA');
         expect(parties[1].id).to.equal(1);
         expect(parties[1].name).to.equal('PartyB');
-    });
-
-    it('Should assign a unique id to each candidate and party', async function () {
-        await election.addCandidate('Alice', 'PartyA');
-        await election.addCandidate('Bob', 'PartyB');
-        await election.addParty('PartyA');
-        await election.addParty('PartyB');
-        const candidates = await election.getCandidates();
-        const parties = await election.getParties();
-        expect(candidates[0].id).to.equal(0);
-        expect(candidates[1].id).to.equal(1);
-        expect(parties[0].id).to.equal(2);
-        expect(parties[1].id).to.equal(3);
     });
 
     it('Should transition to voting phase', async function () {
@@ -117,8 +104,8 @@ describe('Election Contract', function () {
     );
 
     it('Should allow voting', async function () {
-        await election.addCandidate('Alice', 'PartyA');
-        await election.addCandidate('Bob', 'PartyB');
+        await election.addCandidate(0, 'Alice', 'PartyA');
+        await election.addCandidate(1, 'Bob', 'PartyB');
         await election.startVotingPhase();
         await election.castVote(['0', '1']);
         await election.castVote(['1', '0']);

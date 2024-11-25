@@ -76,12 +76,12 @@ describe('POST /vote', () => {
 
         const body = {
             'candidates': [
-                {'name': 'Dwayne The Rock Johnson', 'party': 'democrats' },
-                {'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
-                {'name': 'Tom Hanks', 'party': 'democrats' }
+                {'id': '0', 'name': 'Dwayne The Rock Johnson', 'party': 'democrats' },
+                {'id': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'id': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                {'name': 'democrats' }
+                {'id': '3', 'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };

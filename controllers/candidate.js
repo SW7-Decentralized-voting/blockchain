@@ -26,18 +26,19 @@ async function getCandidates(req, res, next) {
 
 /**
  * Publish a candidate to the blockchain
+ * @param {Number} id The ID of the candidate
  * @param {String} name The name of the candidate
  * @param {String} party name of andidate's party
  * @returns {String} Transaction hash
  */
-async function publishCandidate(name, party) {
+async function publishCandidate(id, name, party) {
     const election = getElection();
     if (election === null) {
         throw new Error('Election has not started');
     }
 
-    if (!name || !party) {
-        throw new Error('candidate name and party are required');
+    if (id == null || !name || !party) {
+        throw new Error('All fields are required');
     }
 
     try {
@@ -46,7 +47,7 @@ async function publishCandidate(name, party) {
             throw new Error('Candidates can only be added during the registration phase');
         }
 
-        const tx = await election.addCandidate(name, party);
+        const tx = await election.addCandidate(id, name, party);
         await tx.wait();
 
         return tx.hash;

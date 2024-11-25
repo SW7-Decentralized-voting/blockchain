@@ -21,7 +21,6 @@ contract Election {
     
     uint public totalCandidates;
     uint public totalParties;
-    uint private uniqueIdCounter;
     
     address public electionOwner;
     string public encryptionKey;
@@ -47,10 +46,9 @@ contract Election {
         _;
     }
 
-    function addCandidate(string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
-        candidates[totalCandidates] = Candidate(uniqueIdCounter, _name, _party);
+    function addCandidate(uint _id, string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
+        candidates[totalCandidates] = Candidate(_id, _name, _party);
         totalCandidates++;
-        uniqueIdCounter++;
     }
 
     function getCandidates() public view returns (Candidate[] memory) {
@@ -61,10 +59,9 @@ contract Election {
         return candidateList;
     }
 
-    function addParty(string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
-        parties[totalParties] = Party(uniqueIdCounter, _name);
+    function addParty(uint _id, string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
+        parties[totalParties] = Party(_id, _name);
         totalParties++;
-        uniqueIdCounter++;
     }
 
     function startVotingPhase() public onlyOwner inPhase(ElectionPhase.Registration) {
@@ -74,7 +71,7 @@ contract Election {
 
     function castVote(string[] memory _encryptedVoteVector) public onlyOwner inPhase(ElectionPhase.Voting) {
     // Check that the vote vector is the correct length
-    require(_encryptedVoteVector.length == uniqueIdCounter, "Invalid vote vector length.");
+    require(_encryptedVoteVector.length == totalCandidates + totalParties, "Invalid vote vector length.");
     encryptedVoteVectors.push(_encryptedVoteVector);
     emit VoteCast(_encryptedVoteVector);
     }
@@ -110,9 +107,5 @@ contract Election {
 
     function getEncryptedVoteVectors() public view returns (string[][] memory) {
         return encryptedVoteVectors;
-    }
-
-    function getUniqueIdCounter() public view returns (uint) {
-        return uniqueIdCounter;
     }
 }

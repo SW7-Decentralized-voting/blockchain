@@ -26,17 +26,18 @@ async function getParties(req, res, next) {
 
 /**
  * Publish a party to the blockchain
+ * @param {Number} id The ID of the party
  * @param {String} name The name of the party
  * @returns {String} Transaction hash
  */
-async function publishParty(name) {
+async function publishParty(id, name) {
     const election = getElection();
     if (election === null) {
         throw new Error('Election has not started');
     }
 
-    if (!name) {
-        throw new Error('Party name is required');
+    if (id == null || !name) {
+        throw new Error('ID and name are required');
     }
 
     try {
@@ -45,7 +46,7 @@ async function publishParty(name) {
             throw new Error('Parties can only be added during the registration phase');
         }
 
-        const tx = await election.addParty(name);
+        const tx = await election.addParty(id, name);
         await tx.wait();
 
         return tx.hash;
