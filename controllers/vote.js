@@ -40,16 +40,8 @@ async function vote(req, res) {
     }
 
     // Construct voteVector array. Must be of length vectorLength, be all zeroes except for the voteId index
-    let voteVector = Array(vectorLength).fill('0');
-    voteVector[voteId] = '1';
-
-    try {
-        voteVector = voteVector.map(vote => BigInt(vote));
-    } catch (error) {
-        return res.status(400).json({ error: 'Invalid vote values in vector:' + error.message });
-    }
-
-    
+    let voteVector = Array(vectorLength).fill(BigInt(0));
+    voteVector[voteId] = BigInt(1);
 
     try {
         const encryptionKeyObject = JSON.parse(encryptionKeyJson);
