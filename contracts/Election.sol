@@ -16,8 +16,8 @@ contract Election {
         string name;
     }
 
-    mapping(uint => Candidate) public candidates;    // To store candidates
-    mapping(uint => Party) public parties;           // To store parties
+    mapping(uint => Candidate) public candidates;
+    mapping(uint => Party) public parties;
     
     uint public totalCandidates;
     uint public totalParties;
