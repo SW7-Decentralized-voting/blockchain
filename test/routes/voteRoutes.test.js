@@ -37,20 +37,18 @@ afterAll(() => {
 
 describe('POST /vote', () => {
     test('It should respond with the error code 400 when no contract is deployed', async () => {
-        const voteVector = [1];
         const response = await request(server)
             .post(baseRoute)
-            .send({ voteVector });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election has not started' });
     });
 
     test('It should respond with 400 when the election is not in the voting phase', async () => {
         await startContract();
-        const voteVector = [1];
         const response = await request(server)
             .post(baseRoute)
-            .send({ voteVector });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election is not in the voting phase' });
     });
@@ -58,10 +56,9 @@ describe('POST /vote', () => {
     test('It should respond with 400 when the election is in the voting phase but no encryption key has been set', async () => {
         await startContract();
         await getElection().startVotingPhase();
-        const voteVector = [1];
         const response = await request(server)
             .post(baseRoute)
-            .send({ voteVector });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({error: 'Encryption key is not set'});
     });
@@ -76,24 +73,22 @@ describe('POST /vote', () => {
 
         const body = {
             'candidates': [
-                {'id': '0', 'name': 'Dwayne The Rock Johnson', 'party': 'democrats' },
-                {'id': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
-                {'id': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
+                {'voteId': '0', 'name': 'Dwayne The Rock Johnson', 'party': 'democrats' },
+                {'voteId': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'voteId': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                {'id': '3', 'name': 'democrats' }
+                {'voteId': '3', 'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
 
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
-
-        const voteVector = [1, 0, 0, 0];
         
         const response = await request(server)
             .post(baseRoute)
-            .send({ voteVector });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ message: 'Vote cast successfully', transactionHash: expect.any(String) });
     });

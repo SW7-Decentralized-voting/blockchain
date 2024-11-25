@@ -113,20 +113,19 @@ describe('GET /encrypted-votes', () => {
 
         const body = {
             'candidates': [
-                {'id': '0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
-                {'id': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
-                {'id': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
+                {'voteId': '0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
+                {'voteId': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'voteId': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                {'id': '3', 'name': 'democrats' }
+                {'voteId': '3', 'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
 
-        const voteVector = [1, 0, 0, 0];
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
-        await request(app).post('/vote').send({ voteVector });
+        await request(app).post('/vote').send({ voteId: 0 });
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/encrypted-votes`);
@@ -203,23 +202,21 @@ describe('GET /tally', () => {
 
         const body = {
             'candidates': [
-                {'id': '0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
-                {'id': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
-                {'id': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
+                {'voteId': '0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
+                {'voteId': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'voteId': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                {'id': '3', 'name': 'democrats' }
+                {'voteId': '3', 'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
-        const v1 = [1, 0, 0, 0];
-        const v2 = [0, 1, 0, 0];
-        const v3 = [1, 0, 0, 0];
+        
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
-        await request(app).post('/vote').send({ voteVector: v1 });
-        await request(app).post('/vote').send({ voteVector: v2 });
-        await request(app).post('/vote').send({ voteVector: v3 });
+        await request(app).post('/vote').send({ voteId: 0 });
+        await request(app).post('/vote').send({ voteId: 1 });
+        await request(app).post('/vote').send({ voteId: 0 });
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/`)

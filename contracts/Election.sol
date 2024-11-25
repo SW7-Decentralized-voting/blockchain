@@ -108,4 +108,8 @@ contract Election {
     function getEncryptedVoteVectors() public view returns (string[][] memory) {
         return encryptedVoteVectors;
     }
+
+    function getRequiredVectorLength() public view returns (uint) {
+        return totalCandidates + totalParties;
+    }
 }

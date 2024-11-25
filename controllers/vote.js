@@ -20,11 +20,28 @@ async function vote(req, res) {
         return res.status(400).json({ error: 'Election is not in the voting phase' });
     }
 
-    let voteVector = req.body.voteVector;
-
-    if (!Array.isArray(voteVector)) {
-        return res.status(400).json({ error: 'voteVector must be an array' });
+    const encryptionKeyJson = await election.encryptionKey();
+    if (!encryptionKeyJson) {
+        return res.status(400).json({ error: 'Encryption key is not set' });
     }
+
+    let voteId = req.body.voteId;
+
+    if (voteId === undefined) {
+        return res.status(400).json({ error: 'Vote ID is required' });
+    }
+
+    let vectorLength;
+
+    try {
+        vectorLength =  Number(await election.getRequiredVectorLength());
+    } catch (error) {
+        return res.status(500).json({ error: 'Error getting required vector length: ' + error.message });
+    }
+
+    // Construct voteVector array. Must be of length vectorLength, be all zeroes except for the voteId index
+    let voteVector = Array(vectorLength).fill('0');
+    voteVector[voteId] = '1';
 
     try {
         voteVector = voteVector.map(vote => BigInt(vote));
@@ -32,10 +49,7 @@ async function vote(req, res) {
         return res.status(400).json({ error: 'Invalid vote values in vector:' + error.message });
     }
 
-    const encryptionKeyJson = await election.encryptionKey();
-    if (!encryptionKeyJson) {
-        return res.status(400).json({ error: 'Encryption key is not set' });
-    }
+    
 
     try {
         const encryptionKeyObject = JSON.parse(encryptionKeyJson);
