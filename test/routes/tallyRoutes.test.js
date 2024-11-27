@@ -5,7 +5,7 @@ import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
 import electionRouter from '../../routes/electionRoutes.js';
 import * as paillierBigint from 'paillier-bigint';
-import { jest } from '@jest/globals';
+import { expect, jest } from '@jest/globals';
 
 let router, voteRouter;
 const baseRoute = '/tally';
@@ -104,14 +104,37 @@ describe('GET /encrypted-votes', () => {
     });
 
     it('Should return the encrypted votes', async () => {
-        await startContract();
+        const { publicKey, _privateKey } = await paillierBigint.generateRandomKeys(3072);
+
+        const publicKeyString = JSON.stringify({
+            n: publicKey.n.toString(),
+            g: publicKey.g.toString()
+        });
+
+        const body = {
+            'candidates': [
+                {'voteId': '0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
+                {'voteId': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'voteId': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
+            ],
+            'parties': [
+                {'voteId': '3', 'name': 'democrats' }
+            ],
+            'publicKey': publicKeyString
+        };
+
+        await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
+        await request(app).post('/vote').send({ voteId: 0 });
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/encrypted-votes`);
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual([]);
+        // expect array of arrays of strings
+        expect(response.body).toEqual([
+            [expect.any(String), expect.any(String), expect.any(String), expect.any(String)]
+        ]);
     });
 }
 );
@@ -179,24 +202,27 @@ describe('GET /tally', () => {
 
         const body = {
             'candidates': [
-                { '_id': '0x0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' }
+                {'voteId': '0', 'name': 'Dwayne "The Rock" Johnson', 'party': 'democrats' },
+                {'voteId': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'voteId': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                { '_id': '0x1', 'name': 'democrats' }
+                {'voteId': '3', 'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
+        
         await request(app).post('/election/start').send(body);
         await getElection().startVotingPhase();
-        await request(app).post('/vote').send({ id: '0x0' });
+        await request(app).post('/vote').send({ voteId: 0 });
+        await request(app).post('/vote').send({ voteId: 1 });
+        await request(app).post('/vote').send({ voteId: 0 });
         await getElection().startTallyingPhase();
         const response = await request(app)
             .get(`${baseRoute}/`)
             .send({ privateKey: privateKeyString });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual({
-            '0': 1
-        });
+        expect(response.body).toEqual({ tally: ['2', '1', '0', '0'] });
     });
 });

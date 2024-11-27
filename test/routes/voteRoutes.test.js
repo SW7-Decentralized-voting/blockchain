@@ -39,7 +39,7 @@ describe('POST /vote', () => {
     test('It should respond with the error code 400 when no contract is deployed', async () => {
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election has not started' });
     });
@@ -48,7 +48,7 @@ describe('POST /vote', () => {
         await startContract();
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election is not in the voting phase' });
     });
@@ -58,7 +58,7 @@ describe('POST /vote', () => {
         await getElection().startVotingPhase();
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({error: 'Encryption key is not set'});
     });
@@ -73,10 +73,12 @@ describe('POST /vote', () => {
 
         const body = {
             'candidates': [
-                { '_id': '0x0', 'name': 'Johan', 'party': 'democrats' }
+                {'voteId': '0', 'name': 'Dwayne The Rock Johnson', 'party': 'democrats' },
+                {'voteId': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'voteId': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
             ],
             'parties': [
-                { '_id': '0x1', 'name': 'democrats' }
+                {'voteId': '3', 'name': 'democrats' }
             ],
             'publicKey': publicKeyString
         };
@@ -86,7 +88,7 @@ describe('POST /vote', () => {
         
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ message: 'Vote cast successfully', transactionHash: expect.any(String) });
     });

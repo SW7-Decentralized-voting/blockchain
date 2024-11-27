@@ -1,6 +1,5 @@
 import { getElection } from '../utils/electionManager.js';
 import { ElectionPhase } from '../utils/constants.js';
-import { Buffer } from 'buffer';
 import * as paillierBigint from 'paillier-bigint';
 
 /**
@@ -21,30 +20,38 @@ async function vote(req, res) {
         return res.status(400).json({ error: 'Election is not in the voting phase' });
     }
 
-    let id  = req.body.id;
-
-    if (!id) {
-        return res.status(400).json({ error: 'id is required' });
-    }
-
-    // Convert id = '0x0' to bigint
-    id = BigInt(id);
-
     const encryptionKeyJson = await election.encryptionKey();
-
     if (!encryptionKeyJson) {
         return res.status(400).json({ error: 'Encryption key is not set' });
     }
 
-    const encryptionKeyObject = JSON.parse(encryptionKeyJson);
-    const publicKey = new paillierBigint.PublicKey(BigInt(encryptionKeyObject.n), BigInt(encryptionKeyObject.g));
-    const encryptedVote = publicKey.encrypt(id);
+    let voteId = req.body.voteId;
 
-    // Ensure that encryptedVoted is bytes memory solidity type
-    const encryptedVoteBuffer = Buffer.from(encryptedVote.toString(16), 'hex');
+    if (voteId === undefined) {
+        return res.status(400).json({ error: 'Vote ID is required' });
+    }
+
+    let vectorLength;
 
     try {
-        const tx = await election.castVote(encryptedVoteBuffer);
+        vectorLength =  Number(await election.getRequiredVectorLength());
+    } catch (error) {
+        return res.status(500).json({ error: 'Error getting required vector length: ' + error.message });
+    }
+
+    // Construct voteVector array. Must be of length vectorLength, be all zeroes except for the voteId index
+    let voteVector = Array(vectorLength).fill(BigInt(0));
+    voteVector[voteId] = BigInt(1);
+
+    try {
+        const encryptionKeyObject = JSON.parse(encryptionKeyJson);
+        const publicKey = new paillierBigint.PublicKey(BigInt(encryptionKeyObject.n), BigInt(encryptionKeyObject.g));
+
+        const encryptedVoteVector = voteVector.map(vote => publicKey.encrypt(BigInt(vote)));
+
+        const encryptedVoteVectorString = encryptedVoteVector.map(vote => vote.toString());
+
+        const tx = await election.castVote(encryptedVoteVectorString);
         await tx.wait();
 
         return res.json({
@@ -52,9 +59,7 @@ async function vote(req, res) {
             transactionHash: tx.hash
         });
     } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-        return res.status(500).json({ error: 'Error casting vote' });
+        return res.status(500).json({ error: 'Error casting vote: ' + error.message });
     }
 }
 

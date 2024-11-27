@@ -41,9 +41,9 @@ describe('GET /candidates', () => {
 
     test('It should respond with 200 when an election is in progress and one candidate added', async () => {
         await startContract();
-        await publishCandidate('deadbeef', 'Candidate 1', 'Party 1');
+        await publishCandidate(0, 'Candidate 1', 'Party 1');
         const response = await request(server).get(baseRoute);
         expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual([['0', 'deadbeef', 'Candidate 1', 'Party 1']]);
+        expect(response.body).toEqual([['0', 'Candidate 1', 'Party 1']]);
     });
 });

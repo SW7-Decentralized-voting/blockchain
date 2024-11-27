@@ -30,11 +30,11 @@ async function startElection(req, res, next) {
         await startContract(ABI, ABIBytecode, accounts.citizen1);
 
         for (const party of parties) {
-            await publishParty(party._id, party.name);
+            await publishParty(party.voteId, party.name);
         }
 
         for (const candidate of candidates) {
-            await publishCandidate(candidate._id, candidate.name, candidate.party);
+            await publishCandidate(candidate.voteId, candidate.name, candidate.party);
         }
 
         // Upload the public key to the contract

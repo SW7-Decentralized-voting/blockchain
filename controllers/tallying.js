@@ -32,32 +32,27 @@ async function decryptAndTallyVotes(req, res) {
 			return res.status(400).send({ error: 'Private key is required' });
 		}
 
-		const votes = await election.getEncryptedVotes();
+		const encryptedVoteVectors = await election.getEncryptedVoteVectors();
 
-		if (!votes) {
+		if (encryptedVoteVectors.length === 0) {
 			return res.status(200).json({});
 		}
 
-		const decryptedVotes = votes.map(vote => {
-			try {
-				return privateKey.decrypt(BigInt(vote));
-
-			} catch (error) {
-				// eslint-disable-next-line no-console
-				console.error(error);
-				return null;
-			}
-
+		// encryptedVoteVectors is an array of arrays of strings
+		// Convert to an array of arrays of BigInts
+		const encryptedVoteVectorsBigInt = encryptedVoteVectors.map(voteVector => {
+			return voteVector.map(vote => BigInt(vote));
 		});
 
-		const tally = decryptedVotes.reduce((acc, vote) => {
-			acc[vote] = acc[vote] ? acc[vote] + 1 : 1;
-			return acc;
-		}, {});
+		// perform homomorphic addition on each vote vector
+		const encryptedTally = encryptedVoteVectorsBigInt.reduce((acc, voteVector) => {
+			return acc.map((vote, index) => publicKey.addition(vote, voteVector[index]));
+		});
 
-		// console.log('Tally:', tally);
+		// Decrypt the tally
+		const tally = encryptedTally.map(vote => privateKey.decrypt(vote));
 
-		res.status(200).json(tally);
+		res.status(200).json({ tally: tally.map(vote => vote.toString()) });
 
 
 

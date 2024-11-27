@@ -5,7 +5,6 @@ const router = express.Router();
 
 router.post('/start', startElection);
 
-// Advance election phase
 router.post('/advance-phase', advanceElectionPhase);
 
 router.get('/current-phase', getCurrentPhase);
