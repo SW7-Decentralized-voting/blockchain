@@ -20,7 +20,7 @@ export default [
       ...jsdoc.configs.recommended.rules,
       "jsdoc/check-types": "off"
     },
-    ignores: ["node_modules/", "eslint.config.js"],
+    ignores: ["node_modules/", "eslint.config.js", "schemas/**/*"],
     languageOptions: {
       globals: globals.node,
     },

@@ -9,7 +9,7 @@ import startContract from '../utils/startContract.js';
  * @param {Request} req Express request object. Should contain the list of candidates and parties
  * @param {Response} res Express response object
  * @param {NextFunction} next Express next function (error handler) 
- * @returns {Response} Express response object with a success message or an error message
+ * @returns {Promise<Response>} Express response object with a success message or an error message
  */
 async function startElection(req, res, next) {
     if (getElection() !== null) {
@@ -30,11 +30,11 @@ async function startElection(req, res, next) {
         await startContract(ABI, ABIBytecode, accounts.citizen1);
 
         for (const party of parties) {
-            await publishParty(party._id, party.name);
+            await publishParty(party.voteId, party.name);
         }
 
         for (const candidate of candidates) {
-            await publishCandidate(candidate._id, candidate.name, candidate.party);
+            await publishCandidate(candidate.voteId, candidate.name, candidate.party);
         }
 
         // Upload the public key to the contract

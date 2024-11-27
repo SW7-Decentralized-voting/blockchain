@@ -7,37 +7,29 @@ contract Election {
 
     struct Candidate {
         uint id;
-        string objectId;
         string name;
         string party;
     }
 
     struct Party {
         uint id;
-        string objectId;
         string name;
     }
 
-    struct VotingKey {
-        bool isValid;
-        bool isUsed;
-    }
-
-    mapping(uint => Candidate) public candidates;    // To store candidates
-    mapping(uint => Party) public parties;           // To store parties
+    mapping(uint => Candidate) public candidates;
+    mapping(uint => Party) public parties;
     
     uint public totalCandidates;
     uint public totalParties;
-    
     
     address public electionOwner;
     string public encryptionKey;
     string public decryptionKey;
 
-    event VoteCast(bytes encryptedVote);
+    event VoteCast(string[] _encryptedVoteVector);
     event PhaseChanged(ElectionPhase newPhase);
 
-    bytes[] public encryptedVotes;
+    string[][] public encryptedVoteVectors;
 
     constructor() {
         electionOwner = msg.sender;
@@ -54,8 +46,8 @@ contract Election {
         _;
     }
 
-    function addCandidate(string memory _objectId, string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
-        candidates[totalCandidates] = Candidate(totalCandidates, _objectId, _name, _party);
+    function addCandidate(uint _id, string memory _name, string memory _party) public onlyOwner inPhase(ElectionPhase.Registration) {
+        candidates[totalCandidates] = Candidate(_id, _name, _party);
         totalCandidates++;
     }
 
@@ -67,8 +59,8 @@ contract Election {
         return candidateList;
     }
 
-    function addParty(string memory _objectId, string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
-        parties[totalParties] = Party(totalParties, _objectId, _name);
+    function addParty(uint _id, string memory _name) public onlyOwner inPhase(ElectionPhase.Registration) {
+        parties[totalParties] = Party(_id, _name);
         totalParties++;
     }
 
@@ -77,9 +69,11 @@ contract Election {
         emit PhaseChanged(ElectionPhase.Voting);
     }
 
-    function castVote(bytes memory _encryptedVote) public onlyOwner inPhase(ElectionPhase.Voting) {
-    encryptedVotes.push(_encryptedVote);
-    emit VoteCast(_encryptedVote);
+    function castVote(string[] memory _encryptedVoteVector) public onlyOwner inPhase(ElectionPhase.Voting) {
+    // Check that the vote vector is the correct length
+    require(_encryptedVoteVector.length == totalCandidates + totalParties, "Invalid vote vector length.");
+    encryptedVoteVectors.push(_encryptedVoteVector);
+    emit VoteCast(_encryptedVoteVector);
     }
 
     function startTallyingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
@@ -111,7 +105,11 @@ contract Election {
         return partyList;
     }
 
-    function getEncryptedVotes() public view returns (bytes[] memory) {
-        return encryptedVotes;
+    function getEncryptedVoteVectors() public view returns (string[][] memory) {
+        return encryptedVoteVectors;
+    }
+
+    function getRequiredVectorLength() public view returns (uint) {
+        return totalCandidates + totalParties;
     }
 }

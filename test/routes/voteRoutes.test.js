@@ -3,6 +3,9 @@ import express from 'express';
 import stopContract from '../../utils/stopContract.js';
 import startContract from '../../utils/startContract.js';
 import { getElection } from '../../utils/electionManager.js';
+import electionRouter from '../../routes/electionRoutes.js';
+import * as paillierBigint from 'paillier-bigint';
+import { jest } from '@jest/globals';
 
 let router;
 const baseRoute = '/vote';
@@ -10,11 +13,18 @@ const baseRoute = '/vote';
 const app = express();
 app.use(express.json());
 app.use(baseRoute, async (req, res, next) => (await router)(req, res, next));
+app.use('/election', electionRouter);
 
 const server = app.listen(0);
 
 beforeAll(async () => {
     router = (await import('../../routes/voteRoutes.js')).default;
+});
+
+jest.unstable_mockModule('../../middleware/auth.js', () => {
+	return {
+		default: jest.fn((req, res, next) => next()),
+	};
 });
 
 beforeEach(async () => {
@@ -29,7 +39,7 @@ describe('POST /vote', () => {
     test('It should respond with the error code 400 when no contract is deployed', async () => {
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election has not started' });
     });
@@ -38,7 +48,7 @@ describe('POST /vote', () => {
         await startContract();
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({ error: 'Election is not in the voting phase' });
     });
@@ -48,9 +58,39 @@ describe('POST /vote', () => {
         await getElection().startVotingPhase();
         const response = await request(server)
             .post(baseRoute)
-            .send({ id: '0x1234567890abcdef' });
+            .send({ voteId: 0 });
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({error: 'Encryption key is not set'});
+    });
+
+    test('It should respond with 200 when the election is in the voting phase and an encryption key has been set', async () => {
+        const { publicKey } = await paillierBigint.generateRandomKeys(3072);
+
+          const publicKeyString = JSON.stringify({
+            n: publicKey.n.toString(),
+            g: publicKey.g.toString()
+          });
+
+        const body = {
+            'candidates': [
+                {'voteId': '0', 'name': 'Dwayne The Rock Johnson', 'party': 'democrats' },
+                {'voteId': '1', 'name': 'Arnold Schwarzenegger', 'party': 'republicans' },
+                {'voteId': '2', 'name': 'Tom Hanks', 'party': 'democrats' }
+            ],
+            'parties': [
+                {'voteId': '3', 'name': 'democrats' }
+            ],
+            'publicKey': publicKeyString
+        };
+
+        await request(app).post('/election/start').send(body);
+        await getElection().startVotingPhase();
+        
+        const response = await request(server)
+            .post(baseRoute)
+            .send({ voteId: 0 });
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toEqual({ message: 'Vote cast successfully', transactionHash: expect.any(String) });
     });
 }
 );
