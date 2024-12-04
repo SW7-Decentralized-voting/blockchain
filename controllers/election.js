@@ -1,5 +1,5 @@
 import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js';
-import { getElection } from '../utils/electionManager.js';
+import { getElection, setElection } from '../utils/electionManager.js';
 import { publishParty } from '../controllers/party.js';
 import { publishCandidate } from '../controllers/candidate.js';
 import startContract from '../utils/startContract.js';
@@ -80,7 +80,8 @@ async function advanceElectionPhase(req, res, next) {
         }
         if (currentPhase === ElectionPhase.Tallying) {
             // Cannot advance past tallying phase
-            res.status(400).json({ error: 'Election has already ended' });
+            setElection(null);
+            res.status(200).json({ message: 'Election has ended' });
         }
     } catch (error) {
         next(error);
@@ -102,7 +103,7 @@ async function getCurrentPhase(req, res, next) {
 
     try {
         const currentPhase = await election.phase();
-        const serializedPhase = currentPhase.toString();
+        const serializedPhase = parseInt(currentPhase);
         res.json({ currentPhase: serializedPhase });
     } catch (error) {
         next(error);
