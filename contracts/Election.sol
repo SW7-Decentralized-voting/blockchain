@@ -70,10 +70,10 @@ contract Election {
     }
 
     function castVote(string[] memory _encryptedVoteVector) public onlyOwner inPhase(ElectionPhase.Voting) {
-    // Check that the vote vector is the correct length
-    require(_encryptedVoteVector.length == totalCandidates + totalParties, "Invalid vote vector length.");
-    encryptedVoteVectors.push(_encryptedVoteVector);
-    emit VoteCast(_encryptedVoteVector);
+        // Check that the vote vector is the correct length
+        require(_encryptedVoteVector.length == totalCandidates + totalParties, "Invalid vote vector length.");
+        encryptedVoteVectors.push(_encryptedVoteVector);
+        emit VoteCast(_encryptedVoteVector);
     }
 
     function startTallyingPhase() public onlyOwner inPhase(ElectionPhase.Voting) {
