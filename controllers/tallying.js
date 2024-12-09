@@ -22,7 +22,7 @@ async function decryptAndTallyVotes(req, res) {
 		}
 
 		// Deserialize the private key string
-		const privateKeyObject = JSON.parse(req.body.privateKey);
+		const privateKeyObject = req.body.privateKey;
 
 		const publicKey = new paillierBigint.PublicKey(BigInt(privateKeyObject.publicKey.n), BigInt(privateKeyObject.publicKey.g));
 		const privateKey = new paillierBigint.PrivateKey(BigInt(privateKeyObject.lambda), BigInt(privateKeyObject.mu), publicKey);
