@@ -58,7 +58,7 @@ async function decryptAndTallyVotes(req, res) {
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error(error);
-		return res.status(500).json({ error: 'Error tallying votes' });
+		return res.status(500).json({ error: 'Error tallying votes', message: error.message });
 	}
 }
 
