@@ -139,11 +139,11 @@ describe('GET /encrypted-votes', () => {
 }
 );
 
-describe('GET /tally', () => {
+describe('POST /tally', () => {
     const privateKey = 'key';
     it('Should return an error if the election has not started', async () => {
         const response = await request(app)
-            .get(baseRoute)
+            .post(baseRoute)
             .send({ privateKey });
 
         expect(response.statusCode).toBe(400);
@@ -153,7 +153,7 @@ describe('GET /tally', () => {
     it('Should return an error if the election is not in the tallying phase', async () => {
         await startContract();
         const response = await request(app)
-            .get(`${baseRoute}/`)
+            .post(`${baseRoute}/`)
             .send({ privateKey });
 
         expect(response.statusCode).toBe(400);
@@ -176,7 +176,7 @@ describe('GET /tally', () => {
         await getElection().startVotingPhase();
         await getElection().startTallyingPhase();
         const response = await request(app)
-            .get(`${baseRoute}/`)
+            .post(`${baseRoute}/`)
             .send({ privateKey: privateKeyString });
 
         expect(response.statusCode).toBe(200);
@@ -219,7 +219,7 @@ describe('GET /tally', () => {
         await request(app).post('/vote').send({ voteId: 0 });
         await getElection().startTallyingPhase();
         const response = await request(app)
-            .get(`${baseRoute}/`)
+            .post(`${baseRoute}/`)
             .send({ privateKey: privateKeyString });
 
         expect(response.statusCode).toBe(200);

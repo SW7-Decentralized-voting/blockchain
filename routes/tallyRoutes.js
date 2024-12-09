@@ -51,7 +51,7 @@ router.get('/encrypted-votes', async (req, res) => {
 }
 );
 
-router.get('/', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     decryptAndTallyVotes(req, res, next);
 }
 );

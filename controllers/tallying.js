@@ -18,12 +18,11 @@ async function decryptAndTallyVotes(req, res) {
 
 		if (await election.phase() !== ElectionPhase.Tallying) {
 			return res.status(400).json({ error: 'Election is not in the tallying phase' });
+
 		}
 
-		const privateKeyObject = req.body.privateKey;
-
 		// Deserialize the private key string
-		//const privateKeyObject = JSON.parse(privateKeyString);
+		const privateKeyObject = JSON.parse(req.body.privateKey);
 
 		const publicKey = new paillierBigint.PublicKey(BigInt(privateKeyObject.publicKey.n), BigInt(privateKeyObject.publicKey.g));
 		const privateKey = new paillierBigint.PrivateKey(BigInt(privateKeyObject.lambda), BigInt(privateKeyObject.mu), publicKey);
