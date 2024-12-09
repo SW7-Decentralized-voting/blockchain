@@ -20,10 +20,10 @@ async function decryptAndTallyVotes(req, res) {
 			return res.status(400).json({ error: 'Election is not in the tallying phase' });
 		}
 
-		const privateKeyString = req.body.privateKey;
+		const privateKeyObject = req.body.privateKey;
 
 		// Deserialize the private key string
-		const privateKeyObject = JSON.parse(privateKeyString);
+		//const privateKeyObject = JSON.parse(privateKeyString);
 
 		const publicKey = new paillierBigint.PublicKey(BigInt(privateKeyObject.publicKey.n), BigInt(privateKeyObject.publicKey.g));
 		const privateKey = new paillierBigint.PrivateKey(BigInt(privateKeyObject.lambda), BigInt(privateKeyObject.mu), publicKey);
@@ -59,7 +59,7 @@ async function decryptAndTallyVotes(req, res) {
 	} catch (error) {
 		// eslint-disable-next-line no-console
 		console.error(error);
-		return res.status(500).json({ error: 'Error tallying votes', message: error.message });
+		return res.status(500).json({ error: 'Error tallying votes' });
 	}
 }
 
