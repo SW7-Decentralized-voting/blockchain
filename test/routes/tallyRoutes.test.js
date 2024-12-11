@@ -139,11 +139,11 @@ describe('GET /encrypted-votes', () => {
 }
 );
 
-describe('GET /tally', () => {
+describe('POST /tally', () => {
     const privateKey = 'key';
     it('Should return an error if the election has not started', async () => {
         const response = await request(app)
-            .get(baseRoute)
+            .post(baseRoute)
             .send({ privateKey });
 
         expect(response.statusCode).toBe(400);
@@ -153,7 +153,7 @@ describe('GET /tally', () => {
     it('Should return an error if the election is not in the tallying phase', async () => {
         await startContract();
         const response = await request(app)
-            .get(`${baseRoute}/`)
+            .post(`${baseRoute}/`)
             .send({ privateKey });
 
         expect(response.statusCode).toBe(400);
@@ -163,21 +163,21 @@ describe('GET /tally', () => {
     it('Should return the tally (empty)', async () => {
         const { privateKey } = await paillierBigint.generateRandomKeys(3072);
 
-        const privateKeyString = JSON.stringify({
+        const privateKeyObject = {
             lambda: privateKey.lambda.toString(),
             mu: privateKey.mu.toString(),
             publicKey: {
                 n: privateKey.publicKey.n.toString(),
                 g: privateKey.publicKey.g.toString()
             }
-        });
+        };
 
         await startContract();
         await getElection().startVotingPhase();
         await getElection().startTallyingPhase();
         const response = await request(app)
-            .get(`${baseRoute}/`)
-            .send({ privateKey: privateKeyString });
+            .post(`${baseRoute}/`)
+            .send({ privateKey: privateKeyObject });
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({});
@@ -186,14 +186,14 @@ describe('GET /tally', () => {
     it('Should return the tally', async () => {
         const { publicKey, privateKey } = await paillierBigint.generateRandomKeys(3072);
 
-        const privateKeyString = JSON.stringify({
+        const privateKeyObject = {
             lambda: privateKey.lambda.toString(),
             mu: privateKey.mu.toString(),
             publicKey: {
                 n: privateKey.publicKey.n.toString(),
                 g: privateKey.publicKey.g.toString()
             }
-        });
+        };
 
         const publicKeyString = JSON.stringify({
             n: publicKey.n.toString(),
@@ -219,8 +219,8 @@ describe('GET /tally', () => {
         await request(app).post('/vote').send({ voteId: 0 });
         await getElection().startTallyingPhase();
         const response = await request(app)
-            .get(`${baseRoute}/`)
-            .send({ privateKey: privateKeyString });
+            .post(`${baseRoute}/`)
+            .send({ privateKey: privateKeyObject });
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ tally: ['2', '1', '0', '0'] });

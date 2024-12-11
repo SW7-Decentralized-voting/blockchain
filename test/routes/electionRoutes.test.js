@@ -103,7 +103,7 @@ describe('Election Routes', () => {
             expect(response.body).toEqual({ message: 'Election phase advanced to tallying phase', transactionHash: expect.any(String) });
         });
 
-        test('It should respond with 400 when an election contract is deployed and in tallying phase', async () => {
+        test('It should respond with 200 when an election contract is deployed and in tallying phase', async () => {
             const body = {
                 'candidates': [
                     {'voteId': '0', 'name': 'Brent Peterson', 'party': 'democrats' }
@@ -116,8 +116,8 @@ describe('Election Routes', () => {
             await request(server).post(baseRoute + '/advance-phase');
             await request(server).post(baseRoute + '/advance-phase');
             const response = await request(server).post(baseRoute + '/advance-phase');
-            expect(response.statusCode).toBe(400);
-            expect(response.body).toEqual({ error: 'Election has already ended' });
+            expect(response.statusCode).toBe(200);
+            expect(response.body).toEqual({ message: 'Election has ended' });
         });
     });
 
@@ -132,7 +132,7 @@ describe('Election Routes', () => {
             await startContract();
             const response = await request(server).get(baseRoute + '/current-phase');
             expect(response.statusCode).toBe(200);
-            expect(response.body).toEqual({ currentPhase: ElectionPhase.Registration.toString() });
+            expect(response.body).toEqual({ currentPhase: Number(ElectionPhase.Registration) });
         });
     });
 });

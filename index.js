@@ -3,9 +3,12 @@ import router from './routes/index.js';
 import { PORT } from './config/config.js';
 import { connectToDb } from './db/index.js';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 
 const app = express();
-app.use(express.json());
+
+// Set a higher limit for JSON body parser
+app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(cors());
 app.use('/', router);
