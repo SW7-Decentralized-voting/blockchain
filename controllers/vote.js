@@ -55,7 +55,7 @@ async function vote(req, res) {
         await tx.wait();
 
         // eslint-disable-next-line no-console
-        console.log(`Vote cast for candidate/party with ID ${voteId}. Transaction hash: ${tx.hash}`);
+        //console.log(`Vote cast for candidate/party with ID ${voteId}. Transaction hash: ${tx.hash}`);
 
         return res.json({
             message: 'Vote cast successfully',

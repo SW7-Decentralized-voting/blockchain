@@ -71,7 +71,7 @@ describe('POST /tally', () => {
         await getElection().startVotingPhase();
 
         let totalVoteTime = 0;
-        const voteCount = 20;
+        const voteCount = 50;
         for (let i = 0; i < voteCount; i++) {
             const startVoteTime = process.hrtime();
             await request(app).post('/vote').send({ voteId: 0 });
