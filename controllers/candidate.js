@@ -28,7 +28,7 @@ async function getCandidates(req, res, next) {
  * Publish a candidate to the blockchain
  * @param {Number} id The ID of the candidate
  * @param {String} name The name of the candidate
- * @param {String} party name of candidate's party
+ * @param {String} party name of andidate's party
  * @returns {String} Transaction hash
  */
 async function publishCandidate(id, name, party) {
