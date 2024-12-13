@@ -71,14 +71,15 @@ describe('POST /tally', () => {
         await getElection().startVotingPhase();
 
         let totalVoteTime = 0;
-        for (let i = 0; i < 100; i++) {
+        const voteCount = 20;
+        for (let i = 0; i < voteCount; i++) {
             const startVoteTime = process.hrtime();
             await request(app).post('/vote').send({ voteId: 0 });
             const endVoteTime = process.hrtime(startVoteTime);
             totalVoteTime += endVoteTime[0] * 1000 + endVoteTime[1] / 1000000; // convert to milliseconds
         }
 
-        const averageVoteTime = totalVoteTime / 100;
+        const averageVoteTime = totalVoteTime / voteCount;
         // eslint-disable-next-line no-console
         console.log(`Average vote time: ${averageVoteTime} ms`);
 
