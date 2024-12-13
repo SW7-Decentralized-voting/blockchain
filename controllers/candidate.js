@@ -50,6 +50,9 @@ async function publishCandidate(id, name, party) {
         const tx = await election.addCandidate(id, name, party);
         await tx.wait();
 
+        // eslint-disable-next-line no-console
+        console.log(`Candidate ${name} in party ${party} added with ID ${id}. Transaction hash: ${tx.hash}`);
+
         return tx.hash;
     } catch (error) {
         // eslint-disable-next-line no-console

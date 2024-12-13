@@ -7,11 +7,11 @@ module.exports = {
   solidity: '0.8.27',
   networks: {
     hardhat: {
-      gasPrice: 0,  // No gas cost for transactions
-      initialBaseFeePerGas: 0,  // No base fee per gas (EIP-1559 compatible)
+      gasPrice: 20000000000,  // Set a reasonable gas price (20 gwei)
+      initialBaseFeePerGas: 20000000000,  // Set the initial base fee (same as gasPrice)
       accounts: {
-        count: 10,  // Define how many accounts you want (e.g., 10 citizens)
-        balance: '10000000000000000000000'  // Each citizen has 10,000 ETH (for testing purposes)
+        count: 10,
+        balance: '10000000000000000000000'  // Each account gets 10,000 ETH
       }
     },
   },

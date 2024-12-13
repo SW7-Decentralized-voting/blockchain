@@ -1,5 +1,5 @@
 import { ABI, ABIBytecode, accounts, ElectionPhase } from '../utils/constants.js';
-import { getElection } from '../utils/electionManager.js';
+import { getElection, setElection } from '../utils/electionManager.js';
 import { publishParty } from '../controllers/party.js';
 import { publishCandidate } from '../controllers/candidate.js';
 import startContract from '../utils/startContract.js';
@@ -66,21 +66,21 @@ async function advanceElectionPhase(req, res, next) {
         if (currentPhase === ElectionPhase.Registration) {
             const tx = await election.startVotingPhase();
             await tx.wait();
+            // eslint-disable-next-line no-console
+            console.log(`Election phase advanced to voting phase. Transaction hash: ${tx.hash}`);
             res.json({ message: 'Election phase advanced to voting phase', transactionHash: tx.hash });
         }
         if (currentPhase === ElectionPhase.Voting) {
             const tx = await election.startTallyingPhase();
             await tx.wait();
-
-            // TODO Store the decryption key in a secure location and upload it during the tallying phase
-            //const tx2 = await election.uploadDecryptionKey();
-            //await tx2.wait();
-            //res.json({ message: 'Election phase advanced to tallying phase', transactionHash: tx.hash, transactionHash2: tx2.hash });
+            // eslint-disable-next-line no-console
+            console.log(`Election phase advanced to tallying phase. Transaction hash: ${tx.hash}`);
             res.json({ message: 'Election phase advanced to tallying phase', transactionHash: tx.hash });
         }
         if (currentPhase === ElectionPhase.Tallying) {
             // Cannot advance past tallying phase
-            res.status(400).json({ error: 'Election has already ended' });
+            setElection(null);
+            res.status(200).json({ message: 'Election has ended' });
         }
     } catch (error) {
         next(error);
@@ -102,7 +102,7 @@ async function getCurrentPhase(req, res, next) {
 
     try {
         const currentPhase = await election.phase();
-        const serializedPhase = currentPhase.toString();
+        const serializedPhase = parseInt(currentPhase);
         res.json({ currentPhase: serializedPhase });
     } catch (error) {
         next(error);
