@@ -38,6 +38,7 @@ afterAll(() => {
 
 
 describe('POST /tally', () => {
+    jest.setTimeout(5000000);
     it('Should return the tally', async () => {
         const { publicKey, privateKey } = await paillierBigint.generateRandomKeys(3072);
 
@@ -71,7 +72,7 @@ describe('POST /tally', () => {
         await getElection().startVotingPhase();
 
         let totalVoteTime = 0;
-        const voteCount = 50;
+        const voteCount = 900;
         for (let i = 0; i < voteCount; i++) {
             const startVoteTime = process.hrtime();
             await request(app).post('/vote').send({ voteId: 0 });

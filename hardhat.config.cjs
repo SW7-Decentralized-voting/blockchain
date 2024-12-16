@@ -7,6 +7,7 @@ module.exports = {
   solidity: '0.8.27',
   networks: {
     hardhat: {
+      blockGasLimit: 1000000000000,
       gasPrice: 1,  // Set a reasonable gas price (20 gwei)
       initialBaseFeePerGas: 1,  // Set the initial base fee (same as gasPrice)
       gas: 30000000,

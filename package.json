@@ -45,7 +45,7 @@
             "/node_modules/",
             "test/contracts/"
         ],
-        "testTimeout": 100000,
+        "testTimeout": 1000000000,
         "globalSetup": "<rootDir>/test/setup/jest-setup.js",
         "globalTeardown": "<rootDir>/test/setup/jest-teardown.js",
         "testEnvironment": "<rootDir>/test/setup/jest-mongo.js"
